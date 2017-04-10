@@ -1,0 +1,57 @@
+package org.pinae.sarabi.service;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.pinae.zazu.service.annotation.Field;
+import org.pinae.zazu.service.annotation.Service;
+
+public class ServiceContainer  {
+	
+	private List<ServiceConfig> serviceCfgList = new ArrayList<ServiceConfig>();
+	
+	public void register(Class<?> clazz) {
+		Method methods[] = clazz.getDeclaredMethods();
+		for (Method method : methods) {
+			if (method.isAnnotationPresent(Service.class)) {
+				Service service = method.getAnnotation(Service.class);
+				
+				String serviceUrl = service.url();
+				String serviceMethod[] = service.method();
+				if (serviceMethod == null) {
+					serviceMethod = new String[]{Http.HTTP_GET};
+				}
+				String mediaType = service.mediaType();
+				
+				Map<String, Parameter> paramMap = new HashMap<String, Parameter>();
+				Parameter params[] = method.getParameters();
+				for (Parameter param : params) {
+					Field field = param.getAnnotation(Field.class);
+					String name = field.name();
+					if (StringUtils.isNotBlank(name)) {
+						paramMap.put(name, param);
+					}
+				}
+				
+				if (StringUtils.isNotBlank(serviceUrl)) {
+					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, mediaType, clazz, method, paramMap));
+				}
+			}
+		}
+	}
+	
+	public ServiceConfig getService(String serviceUrl, String serviceMethod) {
+		for (ServiceConfig serviceCfg : this.serviceCfgList) {
+			if (serviceCfg.isMatched(serviceUrl, serviceMethod)) {
+				return serviceCfg;
+			}
+		}
+		return null;
+	}
+	
+}
