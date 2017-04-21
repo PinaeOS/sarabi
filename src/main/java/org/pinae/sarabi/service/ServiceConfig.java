@@ -3,8 +3,11 @@ package org.pinae.sarabi.service;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 public class ServiceConfig {
 	
@@ -20,9 +23,9 @@ public class ServiceConfig {
 	
 	private Method method;
 	
-	private Map<String, Parameter> params = new HashMap<String, Parameter>();
+	private List<Pair<String, Parameter>> params;
 	
-	public ServiceConfig(String serviceUrl, String serviceMethod[], String mediaType, Class<?> clazz, Method method, Map<String, Parameter> params) {
+	public ServiceConfig(String serviceUrl, String serviceMethod[], String mediaType, Class<?> clazz, Method method, List<Pair<String, Parameter>> params) {
 		this.uuid = UUID.randomUUID().toString();
 		
 		this.serviceUrl = serviceUrl;
@@ -81,11 +84,11 @@ public class ServiceConfig {
 		this.method = method;
 	}
 
-	public Map<String, Parameter> getParams() {
+	public List<Pair<String, Parameter>> getParams() {
 		return params;
 	}
 
-	public void setParams(Map<String, Parameter> params) {
+	public void setParams(List<Pair<String, Parameter>> params) {
 		this.params = params;
 	}
 	

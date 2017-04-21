@@ -9,12 +9,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.pinae.sarabi.service.ServiceConfig;
 import org.pinae.sarabi.service.ServiceContainer;
+import org.pinae.sarabi.service.ServiceException;
+import org.pinae.sarabi.service.ServiceExecutor;
 
 public class ServletHandler extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private ServiceContainer container;
+	private ServiceExecutor executor;
 	
 	public ServletHandler(ServiceContainer container) {
 		this.container = container;
@@ -52,7 +55,12 @@ public class ServletHandler extends HttpServlet {
 		
 		ServiceConfig srvCfg = this.container.getService(uri, method);
 		if (srvCfg != null) {
-			
+			try {
+				Object result = executor.execute(srvCfg, request);
+			} catch (ServiceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }

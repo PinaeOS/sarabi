@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.pinae.zazu.service.annotation.Field;
 import org.pinae.zazu.service.annotation.Service;
 
@@ -28,18 +30,21 @@ public class ServiceContainer  {
 				}
 				String mediaType = service.mediaType();
 				
-				Map<String, Parameter> paramMap = new HashMap<String, Parameter>();
 				Parameter params[] = method.getParameters();
+				
+				List<Pair<String, Parameter>> paramList = new ArrayList<Pair<String, Parameter>>();
+				
 				for (Parameter param : params) {
 					Field field = param.getAnnotation(Field.class);
 					String name = field.name();
 					if (StringUtils.isNotBlank(name)) {
-						paramMap.put(name, param);
+						Pair<String, Parameter> paramRef = new ImmutablePair<String, Parameter>(name, param);
+						paramList.add(paramRef);
 					}
 				}
 				
 				if (StringUtils.isNotBlank(serviceUrl)) {
-					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, mediaType, clazz, method, paramMap));
+					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, mediaType, clazz, method, paramList));
 				}
 			}
 		}
