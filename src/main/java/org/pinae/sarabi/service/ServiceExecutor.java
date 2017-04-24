@@ -13,7 +13,7 @@ import org.pinae.sarabi.service.utils.RequestUtils;
 
 public class ServiceExecutor {
 
-	public Object execute(ServiceConfig srvCfg, HttpServletRequest request) throws ServiceException {
+	public ServiceResponse execute(ServiceConfig srvCfg, HttpServletRequest request) throws ServiceException {
 
 		Class<?> srvCls = srvCfg.getClazz();
 		try {
@@ -49,10 +49,25 @@ public class ServiceExecutor {
 			}
 
 			Object result = srvMethod.invoke(srvObj, args);
-			return result;
+			if (result != null) {
+				if (result instanceof ServiceResponse) {
+					return (ServiceResponse)result;
+				} else {
+					ServiceResponse response = new ServiceResponse(srvCfg.getContentType(), srvCfg.getCharset());
+					response.setStatus(Http.HTTP_OK);
+					if (result != null) {
+						response.setContent(result);
+					}
+					return response;
+				}
+			}
+			return null;
+			
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}
 	}
+	
+
 
 }

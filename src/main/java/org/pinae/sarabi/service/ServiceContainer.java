@@ -3,9 +3,7 @@ package org.pinae.sarabi.service;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -28,7 +26,8 @@ public class ServiceContainer  {
 				if (serviceMethod == null) {
 					serviceMethod = new String[]{Http.HTTP_GET};
 				}
-				String mediaType = service.mediaType();
+				String contentType = service.contentType();
+				String charset = service.charset();
 				
 				Parameter params[] = method.getParameters();
 				
@@ -44,7 +43,7 @@ public class ServiceContainer  {
 				}
 				
 				if (StringUtils.isNotBlank(serviceUrl)) {
-					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, mediaType, clazz, method, paramList));
+					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, contentType, charset, clazz, method, paramList));
 				}
 			}
 		}

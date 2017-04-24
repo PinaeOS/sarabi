@@ -9,8 +9,6 @@ import java.util.Set;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.Request;
-
 public class ResponseUtils {
 
 	public static void output(HttpServletResponse response, int stateCode, String charset, String contentType, Map<String, Object> header,
@@ -60,9 +58,5 @@ public class ResponseUtils {
 	public static void output(HttpServletResponse response, int stateCode, String content) {
 		output(response, stateCode, "utf-8", "text/plain", null, content);
 	}
-
-	public static void exception(String logHeader, Request request, HttpServletResponse response, int stateCode, String content) {
-		output(response, stateCode, "utf-8", "text/plain", null, content);
-		request.setHandled(true);
-	}
+	
 }

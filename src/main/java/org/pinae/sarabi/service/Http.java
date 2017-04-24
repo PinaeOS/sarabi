@@ -24,6 +24,8 @@ public final class Http {
 	 * 
 	 */
 
+	public static final int HTTP_NONE = 0;
+	
 	/* 100 Continue */
 	public static final int HTTP_CONTINUE = 100;
 

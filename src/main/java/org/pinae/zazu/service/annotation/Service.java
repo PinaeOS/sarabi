@@ -16,5 +16,7 @@ public @interface Service {
 	
 	String[] method() default {Http.HTTP_GET};
 	
-	String mediaType() default Http.APPLICATION_JSON;
+	String contentType() default Http.APPLICATION_JSON;
+	
+	String charset() default "utf-8";
 }

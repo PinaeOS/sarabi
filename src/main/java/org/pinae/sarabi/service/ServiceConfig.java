@@ -2,9 +2,7 @@ package org.pinae.sarabi.service;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -17,7 +15,9 @@ public class ServiceConfig {
 	
 	private String serviceMethod[];
 	
-	private String mediaType;
+	private String contentType;
+	
+	private String charset;
 	
 	private Class<?> clazz;
 	
@@ -25,12 +25,14 @@ public class ServiceConfig {
 	
 	private List<Pair<String, Parameter>> params;
 	
-	public ServiceConfig(String serviceUrl, String serviceMethod[], String mediaType, Class<?> clazz, Method method, List<Pair<String, Parameter>> params) {
+	public ServiceConfig(String serviceUrl, String serviceMethod[], String contentType, String charset, Class<?> clazz, Method method, List<Pair<String, Parameter>> params) {
 		this.uuid = UUID.randomUUID().toString();
 		
 		this.serviceUrl = serviceUrl;
 		this.serviceMethod = serviceMethod;
-		this.mediaType = mediaType;
+		this.contentType = contentType;
+		this.charset = charset;
+		
 		this.clazz = clazz;
 		this.method = method;
 		this.params = params;
@@ -60,12 +62,20 @@ public class ServiceConfig {
 		this.serviceMethod = serviceMethod;
 	}
 
-	public String getMediaType() {
-		return mediaType;
+	public String getContentType() {
+		return contentType;
 	}
 
-	public void setMediaType(String mediaType) {
-		this.mediaType = mediaType;
+	public void setContentType(String mediaType) {
+		this.contentType = mediaType;
+	}
+
+	public String getCharset() {
+		return charset;
+	}
+
+	public void setCharset(String charset) {
+		this.charset = charset;
 	}
 
 	public Class<?> getClazz() {

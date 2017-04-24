@@ -7,10 +7,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.pinae.sarabi.service.Http;
 import org.pinae.sarabi.service.ServiceConfig;
 import org.pinae.sarabi.service.ServiceContainer;
 import org.pinae.sarabi.service.ServiceException;
 import org.pinae.sarabi.service.ServiceExecutor;
+import org.pinae.sarabi.service.ServiceOutputor;
+import org.pinae.sarabi.service.ServiceResponse;
+import org.pinae.sarabi.service.utils.ResponseUtils;
 
 public class ServletHandler extends HttpServlet {
 	
@@ -18,9 +22,13 @@ public class ServletHandler extends HttpServlet {
 	
 	private ServiceContainer container;
 	private ServiceExecutor executor;
+	private ServiceOutputor outputor;
 	
 	public ServletHandler(ServiceContainer container) {
 		this.container = container;
+		
+		this.executor = new ServiceExecutor();
+		this.outputor = new ServiceOutputor();
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -50,16 +58,17 @@ public class ServletHandler extends HttpServlet {
 	
 	private void execute(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+		
 		String uri = request.getRequestURI();
 		String method = request.getMethod();
 		
 		ServiceConfig srvCfg = this.container.getService(uri, method);
 		if (srvCfg != null) {
 			try {
-				Object result = executor.execute(srvCfg, request);
+				ServiceResponse srvResponse = this.executor.execute(srvCfg, request);
+				this.outputor.output(response, srvResponse);
 			} catch (ServiceException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ResponseUtils.output(response, Http.HTTP_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
 		}
 	}
