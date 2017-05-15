@@ -16,19 +16,13 @@ public class SarabiServer {
 	
 	private static Logger logger = Logger.getLogger(SarabiServer.class);
 	
-	public static void main(String args[]) {
-		SarabiServer server = new SarabiServer();
-		try {
-			server.startup(args);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	private ServiceContainer container = new ServiceContainer();
+	
+	public <T> void addService(Class<T> clazz) {
+		this.container.register(clazz);
 	}
 	
 	public void startup(String args[]) throws Exception {
-		
-		ServiceContainer container = new ServiceContainer();
-		container.register(org.pinae.sarabi.service.ServiceDemo.class);
 		
 		Server server = new Server();
 		
