@@ -1,5 +1,7 @@
 package org.pinae.sarabi.service;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.CommandLine;
@@ -11,18 +13,31 @@ import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.pinae.sarabi.service.handler.JettyHandler;
+import org.pinae.sarabi.service.utils.ClassLoaderUtils;
+import org.pinae.zazu.service.annotation.Controller;
 
 public class SarabiServer {
 	
 	private static Logger logger = Logger.getLogger(SarabiServer.class);
 	
-	private ServiceContainer container = new ServiceContainer();
-	
-	public <T> void addService(Class<T> clazz) {
-		this.container.register(clazz);
+	private ServiceContainer loadServiceContainer() {
+		ServiceContainer container = new ServiceContainer();
+		try {
+			List<Class<?>> classList = ClassLoaderUtils.loadClass();
+			for (Class<?> clazz : classList) {
+				if (clazz.isAnnotationPresent(Controller.class)) {
+					container.register(clazz);
+				}
+			}
+		} catch (IOException e) {
+			
+		}
+		return container;
 	}
 	
 	public void startup(String args[]) throws Exception {
+		
+		ServiceContainer container = loadServiceContainer();
 		
 		Server server = new Server();
 		

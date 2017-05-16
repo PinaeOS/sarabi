@@ -16,7 +16,6 @@ public class ServiceDemo {
 	
 	public static void main(String[] args) throws Exception {
 		SarabiServer server = new SarabiServer();
-		server.addService(ServiceDemo.class);
 		server.startup(args);
 	}
 	
