@@ -2,6 +2,7 @@ package org.pinae.sarabi.service.demo;
 
 import org.pinae.sarabi.service.Http;
 import org.pinae.sarabi.service.SarabiServer;
+import org.pinae.zazu.service.annotation.Body;
 import org.pinae.zazu.service.annotation.Controller;
 import org.pinae.zazu.service.annotation.Field;
 import org.pinae.zazu.service.annotation.Service;
@@ -9,13 +10,19 @@ import org.pinae.zazu.service.annotation.Service;
 @Controller
 public class ServiceDemo {
 	
-	@Service(url = "/api/publish", method = {Http.HTTP_GET}, contentType = Http.APPLICATION_JSON)
+	@Service(url = "/person/say", method = {Http.HTTP_GET}, contentType = Http.TEXT_PLAIN)
 	public String sayHello(@Field(name = "name") String name) {
 		return "Hello " + name;
 	}
 	
+	@Service(url = "/body/read", method = {Http.HTTP_POST}, contentType = Http.TEXT_PLAIN)
+	public String readBody(@Body String body, @Field(name = "name") String name) {
+		return "Hello " + name + " body=" + body;
+	}
+	
 	public static void main(String[] args) throws Exception {
 		SarabiServer server = new SarabiServer();
+		server.register(ServiceDemo.class);
 		server.startup(args);
 	}
 	

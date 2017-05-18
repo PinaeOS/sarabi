@@ -1,5 +1,6 @@
 package org.pinae.sarabi.service;
 
+import java.io.BufferedReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -28,15 +29,26 @@ public class ServiceExecutor {
 			List<Pair<String, Parameter>> srvParams = srvCfg.getParams();
 			for (Pair<String, Parameter> srvParam : srvParams) {
 				String key = srvParam.getKey();
-				Object value = httpParams.get(key);
-				if (value == null) {
-					value = httpHeaders.get(key);
-				}
-
-				if (value != null) {
-					argList.add(value);
+				if (key.equals("@body")) {
+					BufferedReader br = request.getReader();
+					StringBuffer strBuffer = new StringBuffer();
+					
+					String str = null;
+					while((str = br.readLine()) != null){
+						strBuffer.append(str);
+					}
+					argList.add(strBuffer.toString());
 				} else {
-					argList.add(null);
+					Object value = httpParams.get(key);
+					if (value == null) {
+						value = httpHeaders.get(key);
+					}
+	
+					if (value != null) {
+						argList.add(value);
+					} else {
+						argList.add(null);
+					}
 				}
 			}
 

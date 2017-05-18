@@ -1,6 +1,8 @@
 package org.pinae.sarabi.service;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -18,13 +20,22 @@ import org.pinae.zazu.service.annotation.Controller;
 
 public class SarabiServer {
 	
+	private List<Class<?>> classList = new ArrayList<Class<?>>();
+	
 	private static Logger logger = Logger.getLogger(SarabiServer.class);
 	
-	private ServiceContainer loadServiceContainer() {
+	public void register(Class<?> clazz) {
+		this.classList.add(clazz);
+	}
+	
+	public void startup(String args[]) throws Exception {
 		ServiceContainer container = new ServiceContainer();
+				
 		try {
-			List<Class<?>> classList = ClassLoaderUtils.loadClass();
-			for (Class<?> clazz : classList) {
+			if (this.classList.size() == 0) {
+				this.classList = ClassLoaderUtils.loadClass();
+			}
+			for (Class<?> clazz : this.classList) {
 				if (clazz.isAnnotationPresent(Controller.class)) {
 					container.register(clazz);
 				}
@@ -32,13 +43,7 @@ public class SarabiServer {
 		} catch (IOException e) {
 			
 		}
-		return container;
-	}
-	
-	public void startup(String args[]) throws Exception {
-		
-		ServiceContainer container = loadServiceContainer();
-		
+
 		Server server = new Server();
 		
 		ServerConnector connector = createConnector(server);

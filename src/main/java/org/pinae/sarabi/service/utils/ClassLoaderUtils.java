@@ -148,7 +148,7 @@ public class ClassLoaderUtils {
 					try {
 						classList.add(Class.forName(className));
 					} catch (ClassNotFoundException e) {
-
+						e.printStackTrace();
 					}
 				}
 				return FileVisitResult.CONTINUE;
@@ -164,8 +164,8 @@ public class ClassLoaderUtils {
 		}
 
 		String path = classFile.getAbsolutePath().replace('\\', '/');
-
-		path = path.substring(path.indexOf(rootPath) + rootPath.length()).replace('/', '.');
+		
+		path = path.substring(rootPath.length()).replace('/', '.');
 		if (path.startsWith(".")) {
 			path = path.substring(1);
 		}
