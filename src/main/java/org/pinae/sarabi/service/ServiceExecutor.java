@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.pinae.sarabi.service.listener.RequestListener;
 import org.pinae.sarabi.service.utils.RequestUtils;
 
 public class ServiceExecutor {
@@ -19,6 +20,11 @@ public class ServiceExecutor {
 		Class<?> srvCls = srvCfg.getClazz();
 		try {
 			Object srvObj = srvCls.newInstance();
+			
+			if (srvObj instanceof RequestListener) {
+				((RequestListener)srvObj).setRequest(request);
+			}
+			
 			Method srvMethod = srvCfg.getMethod();
 
 			List<Object> argList = new ArrayList<Object>();
