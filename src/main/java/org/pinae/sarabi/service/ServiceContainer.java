@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.pinae.zazu.service.annotation.Body;
 import org.pinae.zazu.service.annotation.Field;
+import org.pinae.zazu.service.annotation.Header;
 import org.pinae.zazu.service.annotation.Service;
 
 public class ServiceContainer {
@@ -39,6 +40,16 @@ public class ServiceContainer {
 					if (field != null) {
 						String name = field.name();
 						if (StringUtils.isNotBlank(name)) {
+							Pair<String, Parameter> paramRef = new ImmutablePair<String, Parameter>(name, param);
+							paramList.add(paramRef);
+						}
+					}
+					
+					Header header = param.getAnnotation(Header.class);
+					if (header != null) {
+						String name = header.name();
+						if (StringUtils.isNotBlank(name)) {
+							name = "@header." + name;
 							Pair<String, Parameter> paramRef = new ImmutablePair<String, Parameter>(name, param);
 							paramList.add(paramRef);
 						}

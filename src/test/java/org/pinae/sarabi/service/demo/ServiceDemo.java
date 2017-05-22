@@ -5,6 +5,7 @@ import org.pinae.sarabi.service.SarabiServer;
 import org.pinae.zazu.service.annotation.Body;
 import org.pinae.zazu.service.annotation.Controller;
 import org.pinae.zazu.service.annotation.Field;
+import org.pinae.zazu.service.annotation.Header;
 import org.pinae.zazu.service.annotation.Service;
 
 @Controller
@@ -16,8 +17,12 @@ public class ServiceDemo {
 	}
 	
 	@Service(url = "/body/read", method = {Http.HTTP_POST}, contentType = Http.TEXT_PLAIN)
-	public String readBody(@Body String body, @Field(name = "name") String name) {
-		return "Hello " + name + " body=" + body;
+	public String readBody(@Body String body, @Field(name = "name") String name, @Header(name = "Content-Type") String type) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("Content-Type:" + type + "\n");
+		buffer.append("Name:" + name + "\n");
+		buffer.append("body:" + body + "\n");
+		return buffer.toString();
 	}
 	
 	public static void main(String[] args) throws Exception {

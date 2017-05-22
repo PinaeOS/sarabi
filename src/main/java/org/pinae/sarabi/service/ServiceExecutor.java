@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.pinae.sarabi.service.listener.RequestListener;
 import org.pinae.sarabi.service.utils.RequestUtils;
@@ -45,11 +46,14 @@ public class ServiceExecutor {
 					}
 					argList.add(strBuffer.toString());
 				} else {
-					Object value = httpParams.get(key);
-					if (value == null) {
+					Object value = null;
+					if (key.startsWith("@header")) {
+						key = StringUtils.substringAfter(key, "@header.").toUpperCase();
 						value = httpHeaders.get(key);
+					} else {
+						value = httpParams.get(key);
 					}
-	
+					
 					if (value != null) {
 						argList.add(value);
 					} else {
