@@ -19,4 +19,6 @@ public @interface Service {
 	String contentType() default Http.APPLICATION_JSON;
 	
 	String charset() default "utf-8";
+	
+	String[] filter() default {};
 }

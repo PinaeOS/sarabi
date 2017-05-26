@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.pinae.sarabi.service.filter.ServiceFilter;
 
 public class ServiceConfig {
 	
@@ -25,7 +26,10 @@ public class ServiceConfig {
 	
 	private List<Pair<String, Parameter>> params;
 	
-	public ServiceConfig(String serviceUrl, String serviceMethod[], String contentType, String charset, Class<?> clazz, Method method, List<Pair<String, Parameter>> params) {
+	private List<ServiceFilter> filters;
+	
+	public ServiceConfig(String serviceUrl, String serviceMethod[], String contentType, String charset, Class<?> clazz, 
+			Method method, List<Pair<String, Parameter>> params, List<ServiceFilter> filters) {
 		this.uuid = UUID.randomUUID().toString();
 		
 		this.serviceUrl = serviceUrl;
@@ -102,6 +106,14 @@ public class ServiceConfig {
 		this.params = params;
 	}
 	
+	public List<ServiceFilter> getFilters() {
+		return filters;
+	}
+
+	public void setFilters(List<ServiceFilter> filters) {
+		this.filters = filters;
+	}
+
 	public boolean isMatched(String serviceUrl, String serviceMethod) {
 		boolean isMethodMatched = false;
 		for (String _method : this.serviceMethod) {

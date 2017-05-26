@@ -37,7 +37,7 @@ public class SarabiServer {
 			}
 			for (Class<?> clazz : this.classList) {
 				if (clazz.isAnnotationPresent(Controller.class)) {
-					container.register(clazz);
+					container.registerService(clazz);
 				}
 			}
 		} catch (IOException e) {

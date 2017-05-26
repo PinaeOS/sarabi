@@ -11,12 +11,23 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.pinae.sarabi.service.filter.ServiceFilter;
 import org.pinae.sarabi.service.listener.RequestListener;
 import org.pinae.sarabi.service.utils.RequestUtils;
 
 public class ServiceExecutor {
 
 	public ServiceResponse execute(ServiceConfig srvCfg, HttpServletRequest request) throws ServiceException {
+		
+		List<ServiceFilter> filterList = srvCfg.getFilters();
+		for (ServiceFilter filter : filterList) {
+			if (filter != null) {
+				ServiceResponse response = filter.filter(request);
+				if (response.getStatus() != Http.HTTP_OK) {
+					return response;
+				}
+			}
+		}
 
 		Class<?> srvCls = srvCfg.getClazz();
 		try {

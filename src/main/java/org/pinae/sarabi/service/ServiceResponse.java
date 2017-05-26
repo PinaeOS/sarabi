@@ -36,6 +36,15 @@ public class ServiceResponse implements Serializable, Cloneable {
 	public ServiceResponse() {
 
 	}
+	
+	public ServiceResponse(int status) {
+		this.status = status;
+	}
+	
+	public ServiceResponse(int status, Object content) {
+		this.status = status;
+		this.content = content;
+	}
 
 	public ServiceResponse(String contentType) {
 		this.contentType = contentType;
