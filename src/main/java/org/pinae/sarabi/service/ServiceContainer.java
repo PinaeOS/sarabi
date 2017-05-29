@@ -37,7 +37,7 @@ public class ServiceContainer {
 				String contentType = service.contentType();
 				String charset = service.charset();
 				
-				String filterNames[] = service.filter();
+				String[] filterNames = service.filter();
 				List<ServiceFilter> filterList = new ArrayList<ServiceFilter>();
 				for (String filterName : filterNames) {
 					ServiceFilter filter = filterMap.get(filterName);
@@ -77,17 +77,23 @@ public class ServiceContainer {
 				}
 
 				if (StringUtils.isNotBlank(serviceUrl)) {
-					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, contentType, charset, clazz, method, paramList, filterList));
+					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, contentType, charset, 
+							clazz, method, paramList, filterList));
 				}
 			}
 		}
 	}
 	
-	public void registerFilter(String filterName, ServiceFilter filter) {
-		if (StringUtils.isNotBlank(filterName) && filter != null) {
-			this.filterMap.put(filterName, filter);
+	public void registerFilter(ServiceFilter filter) {
+		if (filter != null) {
+			String filterName = filter.getName();
+			if (StringUtils.isNotBlank(filterName)) {
+				this.filterMap.put(filterName, filter);
+			} else {
+				throw new NullPointerException("ServiceFilter name is Null");
+			}
 		} else {
-			throw new NullPointerException("Filter name or bean is Null");
+			throw new NullPointerException("ServiceFilter bean is Null");
 		}
 	}
 

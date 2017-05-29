@@ -1,4 +1,4 @@
-package org.pinae.sarabi.service.utils;
+package org.pinae.sarabi.service.util;
 
 import java.util.Enumeration;
 import java.util.Map;

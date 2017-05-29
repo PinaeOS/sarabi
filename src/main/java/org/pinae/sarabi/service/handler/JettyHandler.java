@@ -15,7 +15,7 @@ import org.pinae.sarabi.service.ServiceException;
 import org.pinae.sarabi.service.ServiceExecutor;
 import org.pinae.sarabi.service.ServiceOutputor;
 import org.pinae.sarabi.service.ServiceResponse;
-import org.pinae.sarabi.service.utils.ResponseUtils;
+import org.pinae.sarabi.service.util.ResponseUtils;
 
 public class JettyHandler extends AbstractHandler {
 	

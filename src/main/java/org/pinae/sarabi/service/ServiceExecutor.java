@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.pinae.sarabi.service.filter.ServiceFilter;
 import org.pinae.sarabi.service.listener.RequestListener;
-import org.pinae.sarabi.service.utils.RequestUtils;
+import org.pinae.sarabi.service.util.RequestUtils;
 
 public class ServiceExecutor {
 
