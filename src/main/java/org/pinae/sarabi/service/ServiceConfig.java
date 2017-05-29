@@ -40,6 +40,8 @@ public class ServiceConfig {
 		this.clazz = clazz;
 		this.method = method;
 		this.params = params;
+		
+		this.filters = filters;
 	}
 
 	public String getUuid() {

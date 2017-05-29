@@ -26,17 +26,21 @@ public class SarabiServer {
 	
 	private static Logger logger = Logger.getLogger(SarabiServer.class);
 	
-	public void register(Class<?> clazz) {
+	public void registerService(Class<?> clazz) {
 		this.classList.add(clazz);
 	}
 	
-	public void filter(ServiceFilter filter) {
+	public void registerFilter(ServiceFilter filter) {
 		this.filterList.add(filter);
 	}
 	
 	public void startup(String args[]) throws Exception {
 		ServiceContainer container = new ServiceContainer();
-				
+		
+		for (ServiceFilter filter : this.filterList) {
+			container.registerFilter(filter);
+		}
+		
 		try {
 			if (this.classList.size() == 0) {
 				this.classList = ClassLoaderUtils.loadClass();
@@ -45,10 +49,6 @@ public class SarabiServer {
 				if (clazz.isAnnotationPresent(Controller.class)) {
 					container.registerService(clazz);
 				}
-			}
-			
-			for (ServiceFilter filter : filterList) {
-				container.registerFilter(filter);
 			}
 		} catch (IOException e) {
 			

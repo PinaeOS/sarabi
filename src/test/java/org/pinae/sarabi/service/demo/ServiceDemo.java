@@ -35,8 +35,8 @@ public class ServiceDemo {
 		authInfo.put("hui", "12345");
 		
 		SarabiServer server = new SarabiServer();
-		server.register(ServiceDemo.class);
-		server.filter(new HttpBasicFilter(authInfo));
+		server.registerFilter(new HttpBasicFilter(authInfo));
+		server.registerService(ServiceDemo.class);
 		server.startup(args);
 	}
 	

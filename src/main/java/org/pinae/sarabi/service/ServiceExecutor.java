@@ -20,11 +20,13 @@ public class ServiceExecutor {
 	public ServiceResponse execute(ServiceConfig srvCfg, HttpServletRequest request) throws ServiceException {
 		
 		List<ServiceFilter> filterList = srvCfg.getFilters();
-		for (ServiceFilter filter : filterList) {
-			if (filter != null) {
-				ServiceResponse response = filter.filter(request);
-				if (response.getStatus() != Http.HTTP_OK) {
-					return response;
+		if (filterList != null) {
+			for (ServiceFilter filter : filterList) {
+				if (filter != null) {
+					ServiceResponse response = filter.filter(request);
+					if (response.getStatus() != Http.HTTP_OK) {
+						return response;
+					}
 				}
 			}
 		}
