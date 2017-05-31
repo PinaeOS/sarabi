@@ -1,15 +1,13 @@
 package org.pinae.sarabi.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -20,27 +18,41 @@ import org.pinae.zazu.service.annotation.Controller;
 
 public class SarabiServer {
 	
+	private static Logger logger = Logger.getLogger(SarabiServer.class);
+
 	private List<Class<?>> classList = new ArrayList<Class<?>>();
-	
+
 	private List<ServiceFilter> filterList = new ArrayList<ServiceFilter>();
 	
-	private static Logger logger = Logger.getLogger(SarabiServer.class);
-	
+	private Properties serverCfg = new Properties();
+
 	public void registerService(Class<?> clazz) {
 		this.classList.add(clazz);
 	}
-	
+
 	public void registerFilter(ServiceFilter filter) {
 		this.filterList.add(filter);
 	}
-	
-	public void startup(String args[]) throws Exception {
+
+	public SarabiServer() {
+
+	}
+
+	public SarabiServer(File configFile) throws ServerException {
+		try {
+			this.serverCfg.load(new FileInputStream(configFile));
+		} catch (IOException e) {
+			throw new ServerException(e);
+		}
+	}
+
+	public void startup() throws ServerException {
 		ServiceContainer container = new ServiceContainer();
-		
+
 		for (ServiceFilter filter : this.filterList) {
 			container.registerFilter(filter);
 		}
-		
+
 		try {
 			if (this.classList.size() == 0) {
 				this.classList = ClassLoaderUtils.loadClass();
@@ -50,35 +62,41 @@ public class SarabiServer {
 					container.registerService(clazz);
 				}
 			}
-		} catch (IOException e) {
 			
+			Server server = new Server();
+
+			ServerConnector connector = createConnector(server);
+
+			server.addConnector(connector);
+			server.setHandler(new JettyHandler(container));
+
+			server.start();
+			server.join();
+		} catch (Exception e) {
+			throw new ServerException(e);
 		}
 
-		Server server = new Server();
-		
-		ServerConnector connector = createConnector(server);
-		
-		server.addConnector(connector);
-		server.setHandler(new JettyHandler(container));
-
-		server.start();
-		server.join();
-
 	}
-	
-	private ServerConnector createConnector(Server server) {
+
+	private ServerConnector createConnector(Server server) throws ServerException {
+		
+		int port = 80;
+		long timeout = 30;
+		try {
+			port = Integer.parseInt(serverCfg.getProperty("server.port", "80"));
+			timeout = Long.parseLong(serverCfg.getProperty("server.timeout", "30"));
+		} catch (NumberFormatException e) {
+			throw new ServerException(e);
+		}
+		
+		String host = serverCfg.getProperty("server.adderss", "0.0.0.0");
+		
 		ServerConnector connector = new ServerConnector(server);
-		connector.setPort(8080);
-		connector.setIdleTimeout(TimeUnit.SECONDS.toMillis(60));
+		connector.setHost(host);
+		connector.setPort(port);
+		connector.setIdleTimeout(TimeUnit.SECONDS.toMillis(timeout));
 
 		return connector;
 	}
-	
-	private static CommandLine parse(String args[]) throws ParseException {
-		Options options = new Options();
-		options.addOption("f", "file", true, "Pumbaa Server config file");
 
-		CommandLineParser parser = new DefaultParser();
-		return parser.parse(options, args);
-	}
 }

@@ -37,7 +37,7 @@ public class ServiceDemo {
 		SarabiServer server = new SarabiServer();
 		server.registerFilter(new HttpBasicFilter(authInfo));
 		server.registerService(ServiceDemo.class);
-		server.startup(args);
+		server.startup();
 	}
 	
 }

@@ -73,6 +73,11 @@
 			<artifactId>nala</artifactId>
 			<version>1.7</version>
 		</dependency>
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-core</artifactId>
+			<version>1.5.13</version>
+		</dependency>
 	</dependencies>
 
 	<organization>
@@ -281,7 +286,7 @@
 					</plugin>
 				</plugins>
 			</build>
-			
+
 			<distributionManagement>
 				<snapshotRepository>
 					<id>oss</id>
