@@ -72,7 +72,7 @@ public class HttpBasicFilter implements ServiceFilter {
 
 	
 	public String getName() {
-		return ServiceFilter.HTTP_BASIC_FILTER;
+		return "HttpBasicFilter";
 	}
 	
 }

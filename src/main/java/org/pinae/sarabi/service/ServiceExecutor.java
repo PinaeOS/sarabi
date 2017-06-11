@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.pinae.sarabi.service.filter.ServiceFilter;
+import org.pinae.sarabi.service.listener.ContextListener;
 import org.pinae.sarabi.service.listener.RequestListener;
 import org.pinae.sarabi.service.util.RequestUtils;
 
@@ -37,6 +38,10 @@ public class ServiceExecutor {
 			
 			if (srvObj instanceof RequestListener) {
 				((RequestListener)srvObj).setRequest(request);
+			}
+			
+			if (srvObj instanceof ContextListener) {
+				((ContextListener)srvObj).handleRequest(request);
 			}
 			
 			Method srvMethod = srvCfg.getMethod();
@@ -84,19 +89,25 @@ public class ServiceExecutor {
 			}
 
 			Object result = srvMethod.invoke(srvObj, args);
+			
+			ServiceResponse response = null;
 			if (result != null) {
 				if (result instanceof ServiceResponse) {
-					return (ServiceResponse)result;
+					response = (ServiceResponse)result;
 				} else {
-					ServiceResponse response = new ServiceResponse(srvCfg.getContentType(), srvCfg.getCharset());
+					response = new ServiceResponse(srvCfg.getContentType(), srvCfg.getCharset());
 					response.setStatus(Http.HTTP_OK);
 					if (result != null) {
 						response.setContent(result);
 					}
-					return response;
 				}
 			}
-			return null;
+			
+			if (srvObj instanceof ContextListener) {
+				((ContextListener)srvObj).handleResponse(response);
+			}
+			
+			return response;
 			
 		} catch (Exception e) {
 			throw new ServiceException(e);
