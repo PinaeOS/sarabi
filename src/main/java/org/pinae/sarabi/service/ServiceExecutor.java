@@ -48,7 +48,8 @@ public class ServiceExecutor {
 
 			List<Object> argList = new ArrayList<Object>();
 
-			Map<String, Object> httpParams = RequestUtils.getParameter(request);
+			Map<String, String> uriParams = RequestUtils.getUrlParameter(srvCfg.getServiceUrl(), request.getRequestURI());
+			Map<String, Object> queryParams = RequestUtils.getParameter(request);
 			Map<String, String> httpHeaders = RequestUtils.getHeader(request);
 
 			List<Pair<String, Parameter>> srvParams = srvCfg.getParams();
@@ -69,7 +70,11 @@ public class ServiceExecutor {
 						key = StringUtils.substringAfter(key, "@header.").toUpperCase();
 						value = httpHeaders.get(key);
 					} else {
-						value = httpParams.get(key);
+						if (uriParams.containsKey(key)) {
+							value = uriParams.get(key);
+						} else {
+							value = queryParams.get(key);
+						}
 					}
 					
 					if (value != null) {

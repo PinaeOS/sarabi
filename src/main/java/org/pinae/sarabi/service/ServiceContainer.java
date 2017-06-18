@@ -100,9 +100,9 @@ public class ServiceContainer {
 		}
 	}
 	
-	public ServiceConfig getService(String serviceUrl, String serviceMethod) {
+	public ServiceConfig getService(String requestUrl, String requestMethod) {
 		for (ServiceConfig serviceCfg : this.serviceCfgList) {
-			if (serviceCfg.isMatched(serviceUrl, serviceMethod)) {
+			if (serviceCfg.isMatched(requestUrl, requestMethod)) {
 				return serviceCfg;
 			}
 		}

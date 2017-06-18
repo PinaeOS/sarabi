@@ -2,9 +2,15 @@ package org.pinae.sarabi.service;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.pinae.sarabi.service.filter.ServiceFilter;
 
@@ -116,15 +122,31 @@ public class ServiceConfig {
 		this.filters = filters;
 	}
 
-	public boolean isMatched(String serviceUrl, String serviceMethod) {
-		boolean isMethodMatched = false;
+	public boolean isMatched(String requestUrl, String serviceMethod) {
+		boolean matchedUrl = false;
+		
+		if (matchedUrl = this.serviceUrl.equals(requestUrl)) {
+			matchedUrl = true;
+		} else {
+			if (this.serviceUrl.matches(".*\\{\\w+\\}.*")) {
+				
+				String srvUrlRegex = this.serviceUrl.replaceAll("\\/", "\\\\/").replaceAll("\\{\\w+\\}", "(\\\\w+|\\\\{\\\\w+\\\\})");
+				srvUrlRegex = "^" + srvUrlRegex + "$";
+				
+				if (this.serviceUrl.matches(srvUrlRegex) && requestUrl.matches(srvUrlRegex)) {
+					return true;
+				}
+			}
+		}
+		
+		boolean matchedMethod = false;
 		for (String _method : this.serviceMethod) {
 			if (_method.equalsIgnoreCase(serviceMethod)) {
-				isMethodMatched = true;
+				matchedMethod = true;
 				break;
 			}
 		}
-		return this.serviceUrl.equals(serviceUrl) && isMethodMatched;
+		return matchedUrl && matchedMethod;
 	}
 	
 }

@@ -12,6 +12,8 @@ import org.pinae.zazu.service.annotation.Field;
 import org.pinae.zazu.service.annotation.Header;
 import org.pinae.zazu.service.annotation.Service;
 
+import com.alibaba.fastjson.JSON;
+
 @Controller
 public class ServiceDemo {
 	
@@ -27,6 +29,14 @@ public class ServiceDemo {
 		buffer.append("Name:" + name + "\n");
 		buffer.append("body:" + body + "\n");
 		return buffer.toString();
+	}
+	
+	@Service(url = "/group/{groupId}/person/{personId}", method = {Http.HTTP_GET}, contentType = Http.APPLICATION_JSON)
+	public String getPerson(@Field(name = "groupId") String groupId, @Field(name = "personId") String personId) {
+		Map<String, String> person = new HashMap<String, String>();
+		person.put("group", groupId);
+		person.put("person", personId);
+		return JSON.toJSONString(person);
 	}
 	
 	public static void main(String[] args) throws Exception {
