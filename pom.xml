@@ -8,7 +8,26 @@
 	<packaging>jar</packaging>
 
 	<name>sarabi</name>
+	<description>Microservices Framework for Java </description>
 	<url>http://maven.apache.org</url>
+	
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Yugeng Hui</name>
+			<email>hyg@pinae.org</email>
+			<organization>PinaeOS</organization>
+			<organizationUrl>http://www.pinae.org</organizationUrl>
+		</developer>
+	</developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

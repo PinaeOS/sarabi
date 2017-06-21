@@ -67,8 +67,8 @@ public class ClassLoaderUtils {
 	 * 
 	 * @return 加载的Class类
 	 * 
-	 * @throws ClassNotFoundException
-	 * @throws IOException
+	 * @throws ClassNotFoundException Class类不存在异常
+	 * @throws IOException IO异常
 	 */
 	public static Class<?> loadClass(String jarDir, String className) throws ClassNotFoundException, IOException {
 		if (jarDir == null) {
@@ -85,13 +85,13 @@ public class ClassLoaderUtils {
 	/**
 	 * 加载指定的Jar文件和类
 	 * 
-	 * @param jarFile Jar文件路径
+	 * @param jarFilenames Jar文件名数组
 	 * @param className Class名称
 	 * 
 	 * @return 加载的Class类
 	 * 
-	 * @throws ClassNotFoundException
-	 * @throws IOException
+	 * @throws ClassNotFoundException Class类不存在异常
+	 * @throws IOException IO异常
 	 */
 	public static Class<?> loadClass(String jarFilenames[], String className) throws ClassNotFoundException, IOException {
 
@@ -133,7 +133,7 @@ public class ClassLoaderUtils {
 	 * 搜索资源目录下所有的class文件返回Class列表
 	 * 
 	 * @return Class列表
-	 * @throws IOException
+	 * @throws IOException IO异常
 	 */
 	public static List<Class<?>> loadClass() throws IOException {
 		final List<Class<?>> classList = new ArrayList<Class<?>>();
