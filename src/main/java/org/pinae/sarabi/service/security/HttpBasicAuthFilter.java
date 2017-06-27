@@ -1,4 +1,4 @@
-package org.pinae.sarabi.service.filter;
+package org.pinae.sarabi.service.security;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,11 +15,11 @@ import org.pinae.sarabi.service.Http;
 import org.pinae.sarabi.service.ServiceResponse;
 import org.pinae.sarabi.service.util.FileUtils;
 
-public class HttpBasicFilter implements ServiceFilter {
+public class HttpBasicAuthFilter implements ServiceSecurity {
 	
 	private Map<String, String> authInfo = new ConcurrentHashMap<String, String>();
 	
-	public HttpBasicFilter() {
+	public HttpBasicAuthFilter() {
 		try {
 			String authFilename = "user.properties";
 			if (authFilename != null) {
@@ -42,7 +42,7 @@ public class HttpBasicFilter implements ServiceFilter {
 		}
 	}
 	
-	public HttpBasicFilter(Map<String, String> authInfo) {
+	public HttpBasicAuthFilter(Map<String, String> authInfo) {
 		this.authInfo = authInfo;
 	}
 
@@ -72,7 +72,7 @@ public class HttpBasicFilter implements ServiceFilter {
 
 	
 	public String getName() {
-		return "HttpBasicFilter";
+		return "HttpBasic";
 	}
-	
+
 }

@@ -14,7 +14,9 @@ import org.pinae.sarabi.service.filter.ServiceFilter;
 import org.pinae.zazu.service.annotation.Body;
 import org.pinae.zazu.service.annotation.Controller;
 import org.pinae.zazu.service.annotation.Field;
+import org.pinae.zazu.service.annotation.Filter;
 import org.pinae.zazu.service.annotation.Header;
+import org.pinae.zazu.service.annotation.Security;
 import org.pinae.zazu.service.annotation.Service;
 
 public class ServiceContainer {
@@ -40,8 +42,31 @@ public class ServiceContainer {
 
 	public void registerService(Class<?> clazz) {
 		
+		List<ServiceFilter> classFilterList =  new ArrayList<ServiceFilter>();
+		if (clazz.isAnnotationPresent(Security.class)) {
+			Security security = clazz.getAnnotation(Security.class);
+			classFilterList.addAll(getSecurity(security));
+		}
+		
+		if (clazz.isAnnotationPresent(Filter.class)) {
+			Filter filter = clazz.getAnnotation(Filter.class);
+			classFilterList.addAll(getFilter(filter));
+		}
+		
 		Method methods[] = clazz.getDeclaredMethods();
 		for (Method method : methods) {
+			
+			List<ServiceFilter> methodFilterList =  new ArrayList<ServiceFilter>();
+			if (method.isAnnotationPresent(Security.class)) {
+				Security security = method.getAnnotation(Security.class);
+				methodFilterList.addAll(getSecurity(security));
+			}
+			
+			if (method.isAnnotationPresent(Filter.class)) {
+				Filter filter = method.getAnnotation(Filter.class);
+				methodFilterList.addAll(getFilter(filter));
+			}
+			
 			if (method.isAnnotationPresent(Service.class)) {
 				Service service = method.getAnnotation(Service.class);
 
@@ -52,15 +77,6 @@ public class ServiceContainer {
 				}
 				String contentType = service.contentType();
 				String charset = service.charset();
-				
-				String[] filterNames = service.filter();
-				List<ServiceFilter> filterList = new ArrayList<ServiceFilter>();
-				for (String filterName : filterNames) {
-					ServiceFilter filter = filterMap.get(filterName);
-					if (filter != null) {
-						filterList.add(filter);
-					}
-				}
 
 				Parameter params[] = method.getParameters();
 
@@ -93,11 +109,45 @@ public class ServiceContainer {
 				}
 
 				if (StringUtils.isNotBlank(serviceUrl)) {
+					List<ServiceFilter> srvFilterList =  new ArrayList<ServiceFilter>();
+					srvFilterList.addAll(classFilterList);
+					srvFilterList.addAll(methodFilterList);
+					
 					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, contentType, charset, 
-							clazz, method, paramList, filterList));
+							clazz, method, paramList, srvFilterList));
 				}
 			}
 		}
+	}
+	
+	private List<ServiceFilter> getSecurity(Security security) {
+		
+		List<ServiceFilter> filterList =  new ArrayList<ServiceFilter>();
+		
+		String[] filterNames = security.name();
+		for (String filterName : filterNames) {
+			ServiceFilter srvFilter = filterMap.get(filterName);
+			if (srvFilter != null) {
+				filterList.add(srvFilter);
+			}
+		}
+		
+		return filterList;
+	}
+	
+private List<ServiceFilter> getFilter(Filter filter) {
+		
+		List<ServiceFilter> filterList =  new ArrayList<ServiceFilter>();
+		
+		String[] filterNames = filter.name();
+		for (String filterName : filterNames) {
+			ServiceFilter srvFilter = filterMap.get(filterName);
+			if (srvFilter != null) {
+				filterList.add(srvFilter);
+			}
+		}
+		
+		return filterList;
 	}
 	
 	public ServiceConfig getService(String requestUrl, String requestMethod) {
