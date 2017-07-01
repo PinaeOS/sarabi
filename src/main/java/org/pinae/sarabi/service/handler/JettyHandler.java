@@ -1,6 +1,7 @@
 package org.pinae.sarabi.service.handler;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,11 +24,11 @@ public class JettyHandler extends AbstractHandler {
 	private ServiceExecutor executor;
 	private ServiceOutputor outputor;
 	
-	public JettyHandler(ServiceContainer container) {
+	public JettyHandler(final Properties serverCfg, final ServiceContainer container) {
 		this.container = container;
 		
 		this.executor = new ServiceExecutor();
-		this.outputor = new ServiceOutputor();
+		this.outputor = new ServiceOutputor(serverCfg);
 	}
 	
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)

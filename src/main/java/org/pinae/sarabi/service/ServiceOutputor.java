@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,9 +22,17 @@ public class ServiceOutputor {
 	
 	private static int KB = 1024;
 	
+	private Properties serverCfg;
+	
+	public ServiceOutputor(final Properties serverCfg) {
+		this.serverCfg = serverCfg;
+	}
+	
 	public long output(HttpServletResponse httpResponse, ServiceResponse srvResponse) throws IOException {
 
 		httpResponse.setStatus(srvResponse.getStatus());
+		
+		httpResponse.addHeader("Server", serverCfg.getProperty("server.name", "Sarabi 1.0"));
 
 		Map<String, String> respHeader = srvResponse.getHeaders();
 		for (String headerKey : respHeader.keySet()) {
@@ -105,6 +114,10 @@ public class ServiceOutputor {
 		PrintWriter writer = response.getWriter();
 		writer.write(content);
 		writer.flush();
-		writer.close();
+		try {
+			writer.close();
+		} finally {
+			
+		}
 	}
 }

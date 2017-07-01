@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 import org.pinae.sarabi.service.filter.ServiceFilter;
 import org.pinae.zazu.service.annotation.Body;
 import org.pinae.zazu.service.annotation.Controller;
@@ -20,6 +21,8 @@ import org.pinae.zazu.service.annotation.Security;
 import org.pinae.zazu.service.annotation.Service;
 
 public class ServiceContainer {
+	
+	private static Logger logger = Logger.getLogger(ServiceContainer.class);
 
 	private List<ServiceConfig> serviceCfgList = new ArrayList<ServiceConfig>();
 	
@@ -40,20 +43,20 @@ public class ServiceContainer {
 		}
 	}
 
-	public void registerService(Class<?> clazz) {
+	public void registerService(Class<?> serviceClass) {
 		
 		List<ServiceFilter> classFilterList =  new ArrayList<ServiceFilter>();
-		if (clazz.isAnnotationPresent(Security.class)) {
-			Security security = clazz.getAnnotation(Security.class);
+		if (serviceClass.isAnnotationPresent(Security.class)) {
+			Security security = serviceClass.getAnnotation(Security.class);
 			classFilterList.addAll(getSecurity(security));
 		}
 		
-		if (clazz.isAnnotationPresent(Filter.class)) {
-			Filter filter = clazz.getAnnotation(Filter.class);
+		if (serviceClass.isAnnotationPresent(Filter.class)) {
+			Filter filter = serviceClass.getAnnotation(Filter.class);
 			classFilterList.addAll(getFilter(filter));
 		}
 		
-		Method methods[] = clazz.getDeclaredMethods();
+		Method methods[] = serviceClass.getDeclaredMethods();
 		for (Method method : methods) {
 			
 			List<ServiceFilter> methodFilterList =  new ArrayList<ServiceFilter>();
@@ -77,6 +80,10 @@ public class ServiceContainer {
 				}
 				String contentType = service.contentType();
 				String charset = service.charset();
+				
+				logger.info(String.format("Register Service: class=%s, method=%s, request-url=%s, http-method=%s, content-type=%s, charset=%s", 
+						serviceClass.getName(), method.getName(),
+						serviceUrl, StringUtils.join(serviceMethod, ","), contentType, charset));
 
 				Parameter params[] = method.getParameters();
 
@@ -113,8 +120,12 @@ public class ServiceContainer {
 					srvFilterList.addAll(classFilterList);
 					srvFilterList.addAll(methodFilterList);
 					
+					for (ServiceFilter srvFilter : srvFilterList) {
+						logger.info(String.format("Add Service Filter: %s to %s", srvFilter.getClass().getName(), serviceClass.getName()));
+					}
+					
 					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, contentType, charset, 
-							clazz, method, paramList, srvFilterList));
+							serviceClass, method, paramList, srvFilterList));
 				}
 			}
 		}
@@ -159,9 +170,8 @@ private List<ServiceFilter> getFilter(Filter filter) {
 		return null;
 	}
 	
-	public void registerFilter(String className) throws ServiceException {
+	public void registerFilter(Class<?> filterClass) throws ServiceException {
 		try {
-			Class<?> filterClass = Class.forName(className);
 			Object filterObj = filterClass.newInstance();
 			if (filterObj instanceof ServiceFilter) {
 				registerFilter((ServiceFilter)filterObj);
@@ -174,11 +184,10 @@ private List<ServiceFilter> getFilter(Filter filter) {
 	public void registerFilter(ServiceFilter filter) {
 		if (filter != null) {
 			String filterName = filter.getName();
-			if (StringUtils.isNotBlank(filterName)) {
-				this.filterMap.put(filterName, filter);
-			} else {
-				throw new NullPointerException("ServiceFilter name is Null");
+			if (StringUtils.isBlank(filterName)) {
+				filterName = filter.getClass().getName();
 			}
+			this.filterMap.put(filterName, filter);
 		} else {
 			throw new NullPointerException("ServiceFilter bean is Null");
 		}

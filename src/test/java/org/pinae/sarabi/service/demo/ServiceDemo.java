@@ -1,11 +1,13 @@
 package org.pinae.sarabi.service.demo;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.pinae.sarabi.service.Http;
 import org.pinae.sarabi.service.SarabiServer;
 import org.pinae.sarabi.service.security.HttpBasicAuthFilter;
+import org.pinae.sarabi.service.util.FileUtils;
 import org.pinae.zazu.service.annotation.Body;
 import org.pinae.zazu.service.annotation.Controller;
 import org.pinae.zazu.service.annotation.Field;
@@ -35,7 +37,7 @@ public class ServiceDemo {
 	}
 	
 	@Service(url = "/group/{groupId}/person/{personId}", method = {Http.HTTP_GET}, contentType = Http.APPLICATION_JSON)
-	@Filter(name = "CustomeFilter")
+	@Filter(name = "CustomFilter")
 	public String getPerson(@Field(name = "groupId") String groupId, @Field(name = "personId") String personId) {
 		Map<String, String> person = new HashMap<String, String>();
 		person.put("group", groupId);
@@ -47,7 +49,9 @@ public class ServiceDemo {
 		Map<String, String> authInfo = new HashMap<String, String>();
 		authInfo.put("hui", "12345");
 		
-		SarabiServer server = new SarabiServer();
+		File serverProp = FileUtils.getFile("server.properties");
+		
+		SarabiServer server = new SarabiServer(serverProp);
 		server.registerFilter(new CustomFilter());
 		server.registerFilter(new HttpBasicAuthFilter(authInfo));
 		server.registerService(ServiceDemo.class);

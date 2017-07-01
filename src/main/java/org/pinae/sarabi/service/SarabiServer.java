@@ -13,6 +13,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.pinae.sarabi.service.filter.ServiceFilter;
 import org.pinae.sarabi.service.handler.JettyHandler;
+import org.pinae.sarabi.service.security.ServiceSecurity;
 import org.pinae.sarabi.service.util.ClassLoaderUtils;
 import org.pinae.zazu.service.annotation.Controller;
 
@@ -47,6 +48,9 @@ public class SarabiServer {
 	}
 
 	public void startup() throws ServerException {
+		
+		long startTime = System.currentTimeMillis();
+		
 		ServiceContainer container = new ServiceContainer();
 
 		for (ServiceFilter filter : this.filterList) {
@@ -57,10 +61,19 @@ public class SarabiServer {
 			if (this.classList.size() == 0) {
 				this.classList = ClassLoaderUtils.loadClass();
 			}
+			
 			for (Class<?> clazz : this.classList) {
 				if (clazz.isAnnotationPresent(Controller.class)) {
 					container.registerService(clazz);
 				}
+				try {
+					if (clazz.asSubclass(ServiceFilter.class) != null || clazz.asSubclass(ServiceSecurity.class) != null) {
+						container.registerFilter(clazz);
+					}
+				} catch (ClassCastException e) {
+					
+				}
+				
 			}
 			
 			Server server = new Server();
@@ -68,9 +81,13 @@ public class SarabiServer {
 			ServerConnector connector = createConnector(server);
 
 			server.addConnector(connector);
-			server.setHandler(new JettyHandler(container));
+			server.setHandler(new JettyHandler(this.serverCfg, container));
 
 			server.start();
+			
+			long usedTime = System.currentTimeMillis() - startTime;
+			logger.info(String.format("Startup Sarabi Finish, used: %d ms", usedTime));
+			
 			server.join();
 		} catch (Exception e) {
 			throw new ServerException(e);
@@ -90,6 +107,9 @@ public class SarabiServer {
 		}
 		
 		String host = serverCfg.getProperty("server.adderss", "0.0.0.0");
+		
+		logger.info(String.format("Startup Sarabi, listen: %s:%d", host, port));
+		logger.info(String.format("Set Sarabi, timeout: %d ms", timeout));
 		
 		ServerConnector connector = new ServerConnector(server);
 		connector.setHost(host);

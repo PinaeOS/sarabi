@@ -6,6 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class FileUtils {
+	
+	public static File getFile(String filename) {
+		return getFile(null, filename);
+	}
 
 	public static File getFile(String path, String filename) {
 		File file = new File(filename);
