@@ -22,9 +22,9 @@ public class ServiceOutputor {
 	
 	private static int KB = 1024;
 	
-	private Properties serverCfg;
+	private ServerConfig serverCfg;
 	
-	public ServiceOutputor(final Properties serverCfg) {
+	public ServiceOutputor(final ServerConfig serverCfg) {
 		this.serverCfg = serverCfg;
 	}
 	
@@ -32,7 +32,7 @@ public class ServiceOutputor {
 
 		httpResponse.setStatus(srvResponse.getStatus());
 		
-		httpResponse.addHeader("Server", serverCfg.getProperty("server.name", "Sarabi 1.0"));
+		httpResponse.addHeader("Server", serverCfg.getName());
 
 		Map<String, String> respHeader = srvResponse.getHeaders();
 		for (String headerKey : respHeader.keySet()) {

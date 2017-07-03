@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
@@ -25,7 +24,7 @@ public class SarabiServer {
 
 	private List<ServiceFilter> filterList = new ArrayList<ServiceFilter>();
 	
-	private Properties serverCfg = new Properties();
+	private Properties serverProp = new Properties();
 
 	public void registerService(Class<?> clazz) {
 		this.classList.add(clazz);
@@ -41,7 +40,7 @@ public class SarabiServer {
 
 	public SarabiServer(File configFile) throws ServerException {
 		try {
-			this.serverCfg.load(new FileInputStream(configFile));
+			this.serverProp.load(new FileInputStream(configFile));
 		} catch (IOException e) {
 			throw new ServerException(e);
 		}
@@ -73,15 +72,15 @@ public class SarabiServer {
 				} catch (ClassCastException e) {
 					
 				}
-				
 			}
 			
 			Server server = new Server();
-
-			ServerConnector connector = createConnector(server);
+			
+			ServerConfig serverCfg = new ServerConfig(this.serverProp);
+			ServerConnector connector = createConnector(server, serverCfg);
 
 			server.addConnector(connector);
-			server.setHandler(new JettyHandler(this.serverCfg, container));
+			server.setHandler(new JettyHandler(serverCfg, container));
 
 			server.start();
 			
@@ -95,28 +94,18 @@ public class SarabiServer {
 
 	}
 
-	private ServerConnector createConnector(Server server) throws ServerException {
-		
-		int port = 80;
-		long timeout = 30;
-		try {
-			port = Integer.parseInt(serverCfg.getProperty("server.port", "80"));
-			timeout = Long.parseLong(serverCfg.getProperty("server.timeout", "30"));
-		} catch (NumberFormatException e) {
-			throw new ServerException(e);
-		}
-		
-		String host = serverCfg.getProperty("server.adderss", "0.0.0.0");
-		
-		logger.info(String.format("Startup Sarabi, listen: %s:%d", host, port));
-		logger.info(String.format("Set Sarabi, timeout: %d ms", timeout));
-		
-		ServerConnector connector = new ServerConnector(server);
-		connector.setHost(host);
-		connector.setPort(port);
-		connector.setIdleTimeout(TimeUnit.SECONDS.toMillis(timeout));
+	private ServerConnector createConnector(Server server, ServerConfig serverCfg) throws ServerException {
 
+		logger.info(String.format("Startup Sarabi, listen: %s:%d", serverCfg.getAddress(), serverCfg.getPort()));
+		logger.info(String.format("Set Timeout: %d ms", serverCfg.getTimeout()));
+		logger.info(String.format("Set Output Buffer Size: %d KB", serverCfg.getOutputBufferSize() / ServerConfig.KB));
+		logger.info(String.format("Set Request Header Size: %d KB", serverCfg.getRequestHeaderSize() / ServerConfig.KB));
+		logger.info(String.format("Set Response Header Size: %d KB", serverCfg.getResponseHeaderSize() / ServerConfig.KB));
+		
+		ServerConnector connector = serverCfg.getConnector(server);
+		
 		return connector;
 	}
+	
 
 }

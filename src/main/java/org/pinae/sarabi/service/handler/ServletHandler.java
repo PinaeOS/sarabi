@@ -1,7 +1,6 @@
 package org.pinae.sarabi.service.handler;
 
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -9,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pinae.sarabi.service.Http;
+import org.pinae.sarabi.service.ServerConfig;
 import org.pinae.sarabi.service.ServiceConfig;
 import org.pinae.sarabi.service.ServiceContainer;
 import org.pinae.sarabi.service.ServiceException;
@@ -25,7 +25,7 @@ public class ServletHandler extends HttpServlet {
 	private ServiceExecutor executor;
 	private ServiceOutputor outputor;
 	
-	public ServletHandler(final Properties serverCfg, final ServiceContainer container) {
+	public ServletHandler(final ServerConfig serverCfg, final ServiceContainer container) {
 		this.container = container;
 		
 		this.executor = new ServiceExecutor();
