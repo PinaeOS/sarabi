@@ -21,10 +21,10 @@ public class SarabiServer {
 	private static Logger logger = Logger.getLogger(SarabiServer.class);
 
 	private List<Class<?>> classList = new ArrayList<Class<?>>();
-
+	
 	private List<ServiceFilter> filterList = new ArrayList<ServiceFilter>();
 	
-	private Properties serverProp = new Properties();
+	private ServerConfig serverCfg;
 
 	public void registerService(Class<?> clazz) {
 		this.classList.add(clazz);
@@ -37,10 +37,16 @@ public class SarabiServer {
 	public SarabiServer() {
 
 	}
+	
+	public SarabiServer(ServerConfig serverCfg) {
+		this.serverCfg = serverCfg;
+	}
 
 	public SarabiServer(File configFile) throws ServerException {
 		try {
-			this.serverProp.load(new FileInputStream(configFile));
+			Properties serverProp = new Properties();
+			serverProp.load(new FileInputStream(configFile));
+			this.serverCfg = new ServerConfig(serverProp);
 		} catch (IOException e) {
 			throw new ServerException(e);
 		}
@@ -75,12 +81,11 @@ public class SarabiServer {
 			}
 			
 			Server server = new Server();
-			
-			ServerConfig serverCfg = new ServerConfig(this.serverProp);
-			ServerConnector connector = createConnector(server, serverCfg);
+
+			ServerConnector connector = createConnector(server, this.serverCfg);
 
 			server.addConnector(connector);
-			server.setHandler(new JettyHandler(serverCfg, container));
+			server.setHandler(new JettyHandler(this.serverCfg, container));
 
 			server.start();
 			

@@ -49,7 +49,7 @@ public class HttpBasicAuthFilter implements ServiceSecurity {
 	public ServiceResponse filter(HttpServletRequest request) {
 		String authReq = request.getHeader("Authorization");
 		if (authReq == null) {
-			return new ServiceResponse(Http.HTTP_UNAUTHORIZED, "Couldn't find authorization config");
+			return new ServiceResponse(Http.HTTP_UNAUTHORIZED, "Lost Authorization");
 		}
 		if (authReq.startsWith("Basic")) {
 			authReq = StringUtils.substringAfter(authReq, "Basic").trim();

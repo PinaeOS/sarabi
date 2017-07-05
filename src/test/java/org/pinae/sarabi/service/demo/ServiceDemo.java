@@ -1,13 +1,12 @@
 package org.pinae.sarabi.service.demo;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.pinae.sarabi.service.Http;
 import org.pinae.sarabi.service.SarabiServer;
+import org.pinae.sarabi.service.ServerConfig;
 import org.pinae.sarabi.service.security.HttpBasicAuthFilter;
-import org.pinae.sarabi.service.util.FileUtils;
 import org.pinae.zazu.service.annotation.Body;
 import org.pinae.zazu.service.annotation.Controller;
 import org.pinae.zazu.service.annotation.Field;
@@ -49,9 +48,12 @@ public class ServiceDemo {
 		Map<String, String> authInfo = new HashMap<String, String>();
 		authInfo.put("hui", "12345");
 		
-		File serverProp = FileUtils.getFile("server.properties");
+		ServerConfig serverCfg = new ServerConfig();
+		serverCfg.setAddress("0.0.0.0");
+		serverCfg.setPort(8080);
+		serverCfg.setTimeout(180);
 		
-		SarabiServer server = new SarabiServer(serverProp);
+		SarabiServer server = new SarabiServer(serverCfg);
 		server.registerFilter(new CustomFilter());
 		server.registerFilter(new HttpBasicAuthFilter(authInfo));
 		server.registerService(ServiceDemo.class);
