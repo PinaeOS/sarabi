@@ -65,12 +65,13 @@ public class ServletHandler extends HttpServlet {
 		
 		ServiceConfig srvCfg = this.container.getService(uri, method);
 		if (srvCfg != null) {
+			ServiceResponse srvResponse = null;
 			try {
-				ServiceResponse srvResponse = this.executor.execute(srvCfg, request);
-				this.outputor.output(response, srvResponse);
+				srvResponse = this.executor.execute(srvCfg, request);
 			} catch (ServiceException e) {
 				ResponseUtils.output(response, Http.HTTP_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
+			this.outputor.output(request, response, srvResponse);
 		}
 	}
 }

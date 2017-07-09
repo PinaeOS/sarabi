@@ -7,11 +7,12 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.log4j.Logger;
 import org.pinae.nala.xb.Xml;
 import org.pinae.nala.xb.exception.MarshalException;
 import org.pinae.nala.xb.util.Constant;
@@ -19,6 +20,8 @@ import org.pinae.nala.xb.util.Constant;
 import com.alibaba.fastjson.JSON;
 
 public class ServiceOutputor {
+	
+	private Logger logger = Logger.getLogger("access");
 	
 	private static int KB = 1024;
 	
@@ -28,7 +31,7 @@ public class ServiceOutputor {
 		this.serverCfg = serverCfg;
 	}
 	
-	public long output(HttpServletResponse httpResponse, ServiceResponse srvResponse) throws IOException {
+	public long output(HttpServletRequest httpRequest, HttpServletResponse httpResponse, ServiceResponse srvResponse) throws IOException {
 
 		httpResponse.setStatus(srvResponse.getStatus());
 		
@@ -99,6 +102,8 @@ public class ServiceOutputor {
 		} else {
 			print("", httpResponse);
 		}
+		
+		log(httpRequest, httpResponse);
 
 		return contentSize;
 
@@ -119,5 +124,24 @@ public class ServiceOutputor {
 		} finally {
 			
 		}
+	}
+	
+	private void log(HttpServletRequest request, HttpServletResponse response) {
+		String logFmt = "client=%s, agent=%s, schema=%s, method=%s, uri=%s, status=%d, respBody=%d";
+		
+		String remoteAddr = request.getRemoteHost();
+		String reqSchema = request.getScheme();
+		String reqMethod = request.getMethod();
+		String reqUri = request.getRequestURI();
+		int status = response.getStatus();
+		long bodySize = 0;
+		try {
+			bodySize = Long.parseLong(response.getHeader("Content-Length"));
+		} catch (Exception e) {
+			bodySize = 0;
+		}
+		String userAgent = request.getHeader("User-Agent");
+		
+		logger.info(String.format(logFmt, remoteAddr, userAgent, reqSchema, reqMethod, reqUri, status, bodySize));
 	}
 }
