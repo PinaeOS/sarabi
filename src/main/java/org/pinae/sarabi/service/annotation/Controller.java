@@ -1,4 +1,4 @@
-package org.pinae.zazu.service.annotation;
+package org.pinae.sarabi.service.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

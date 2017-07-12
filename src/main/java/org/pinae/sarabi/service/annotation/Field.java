@@ -1,4 +1,4 @@
-package org.pinae.zazu.service.annotation;
+package org.pinae.sarabi.service.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -7,8 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Filter {
-	String[] name();
+public @interface Field {
+	String name();
 }
