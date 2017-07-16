@@ -55,7 +55,7 @@ public class ServiceExecutor {
 			List<Pair<String, Parameter>> srvParams = srvCfg.getParams();
 			for (Pair<String, Parameter> srvParam : srvParams) {
 				String key = srvParam.getKey();
-				if (key.equals("@body")) {
+				if ("@body".equals(key)) {
 					BufferedReader br = request.getReader();
 					StringBuffer strBuffer = new StringBuffer();
 					
@@ -64,6 +64,12 @@ public class ServiceExecutor {
 						strBuffer.append(str);
 					}
 					argList.add(strBuffer.toString());
+				} else if ("@url".equals(key)) {
+					argList.add(uriParams);
+				} else if ("@query".equals(key) || "@parameter".equals(key)) {
+					argList.add(queryParams);
+				} else if ("@header".equals(key)) {
+					argList.add(httpHeaders);
 				} else {
 					Object value = null;
 					if (key.startsWith("@header")) {
@@ -92,13 +98,23 @@ public class ServiceExecutor {
 					args[i] = argList.get(i);
 				}
 			}
-
-			Object result = srvMethod.invoke(srvObj, args);
 			
 			ServiceResponse response = null;
-			if (result != null) {
+			
+			Object result = null;
+			try {
+				result = srvMethod.invoke(srvObj, args);
+			} catch (IllegalArgumentException e1) {
+				response = new ServiceResponse(Http.HTTP_BAD_REQUEST, "Illegal request argument:" + e1.getMessage());
+			} catch (IllegalAccessException e2) {
+				response = new ServiceResponse(Http.HTTP_INTERNAL_SERVER_ERROR, "Illegal access method: " + srvMethod.getName());
+			}
+			
+			if (response == null) {
 				if (result instanceof ServiceResponse) {
-					response = (ServiceResponse)result;
+					if (result != null) {
+						response = (ServiceResponse)result;
+					}
 				} else {
 					response = new ServiceResponse(srvCfg.getContentType(), srvCfg.getCharset());
 					response.setStatus(Http.HTTP_OK);
