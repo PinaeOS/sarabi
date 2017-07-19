@@ -44,20 +44,13 @@ public class ServiceDemo {
 		return JSON.toJSONString(person);
 	}
 	
-	public static void main(String[] args) throws Exception {
-		Map<String, String> authInfo = new HashMap<String, String>();
-		authInfo.put("hui", "12345");
+	@Service(url = "/get/request", method = {Http.HTTP_GET}, contentType = Http.APPLICATION_JSON)
+	public String getRequest(@Field(name = "@query") Map<String, Object> query, @Field(name = "@header") Map<String, String> header) {
+		Map<String, Object> request = new HashMap<String, Object>();
+		request.put("query", query);
+		request.put("header", header);
 		
-		ServerConfig serverCfg = new ServerConfig();
-		serverCfg.setAddress("0.0.0.0");
-		serverCfg.setPort(8080);
-		serverCfg.setTimeout(180);
-		
-		SarabiServer server = new SarabiServer(serverCfg);
-		server.registerFilter(new CustomFilter());
-		server.registerFilter(new HttpBasicAuthFilter(authInfo));
-		server.registerService(ServiceDemo.class);
-		server.startup();
+		return JSON.toJSONString(request);
 	}
 	
 }
