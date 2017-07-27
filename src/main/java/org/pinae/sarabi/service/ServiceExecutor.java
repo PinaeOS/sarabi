@@ -53,8 +53,11 @@ public class ServiceExecutor {
 
 		Class<?> srvCls = srvCfg.getClazz();
 		try {
-			Object srvObj = getServiceObject(srvCls);
-
+			Object srvObj = srvCfg.getObject();
+			if (srvObj == null) {
+				srvObj = getServiceObject(srvCls);
+			}
+			
 			if (srvObj instanceof RequestListener) {
 				((RequestListener) srvObj).setRequest(request);
 			}

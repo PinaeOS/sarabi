@@ -21,13 +21,13 @@ import org.pinae.sarabi.service.annotation.Service;
 import org.pinae.sarabi.service.filter.ServiceFilter;
 
 public class ServiceContainer {
-	
+
 	private static Logger logger = Logger.getLogger(ServiceContainer.class);
 
 	private List<ServiceConfig> serviceCfgList = new ArrayList<ServiceConfig>();
-	
+
 	private Map<String, ServiceFilter> filterMap = new HashMap<String, ServiceFilter>();
-	
+
 	public void registerService(String className) throws ServiceException {
 		try {
 			registerService(Class.forName(className));
@@ -35,41 +35,41 @@ public class ServiceContainer {
 			throw new ServiceException(e);
 		}
 	}
-	
+
 	public void registerService(Object serviceObj) {
 		Class<?> serviceCls = serviceObj.getClass();
 		if (serviceCls.isAnnotationPresent(Controller.class)) {
-			registerService(serviceCls);
+			registerService(serviceCls, serviceObj);
 		}
 	}
 
-	public void registerService(Class<?> serviceClass) {
-		
-		List<ServiceFilter> classFilterList =  new ArrayList<ServiceFilter>();
+	public void registerService(Class<?> serviceClass, Object serviceObj) {
+
+		List<ServiceFilter> classFilterList = new ArrayList<ServiceFilter>();
 		if (serviceClass.isAnnotationPresent(Security.class)) {
 			Security security = serviceClass.getAnnotation(Security.class);
 			classFilterList.addAll(getSecurity(security));
 		}
-		
+
 		if (serviceClass.isAnnotationPresent(Filter.class)) {
 			Filter filter = serviceClass.getAnnotation(Filter.class);
 			classFilterList.addAll(getFilter(filter));
 		}
-		
+
 		Method methods[] = serviceClass.getDeclaredMethods();
 		for (Method method : methods) {
-			
-			List<ServiceFilter> methodFilterList =  new ArrayList<ServiceFilter>();
+
+			List<ServiceFilter> methodFilterList = new ArrayList<ServiceFilter>();
 			if (method.isAnnotationPresent(Security.class)) {
 				Security security = method.getAnnotation(Security.class);
 				methodFilterList.addAll(getSecurity(security));
 			}
-			
+
 			if (method.isAnnotationPresent(Filter.class)) {
 				Filter filter = method.getAnnotation(Filter.class);
 				methodFilterList.addAll(getFilter(filter));
 			}
-			
+
 			if (method.isAnnotationPresent(Service.class)) {
 				Service service = method.getAnnotation(Service.class);
 
@@ -80,10 +80,9 @@ public class ServiceContainer {
 				}
 				String contentType = service.contentType();
 				String charset = service.charset();
-				
-				logger.info(String.format("Register Service: class=%s, method=%s, request-url=%s, http-method=%s, content-type=%s, charset=%s", 
-						serviceClass.getName(), method.getName(),
-						serviceUrl, StringUtils.join(serviceMethod, ","), contentType, charset));
+
+				logger.info(String.format("Register Service: class=%s, method=%s, request-url=%s, http-method=%s, content-type=%s, charset=%s",
+						serviceClass.getName(), method.getName(), serviceUrl, StringUtils.join(serviceMethod, ","), contentType, charset));
 
 				Parameter params[] = method.getParameters();
 
@@ -98,7 +97,7 @@ public class ServiceContainer {
 							paramList.add(paramRef);
 						}
 					}
-					
+
 					Header header = param.getAnnotation(Header.class);
 					if (header != null) {
 						String name = header.name();
@@ -108,7 +107,7 @@ public class ServiceContainer {
 							paramList.add(paramRef);
 						}
 					}
-					
+
 					Body body = param.getAnnotation(Body.class);
 					if (body != null) {
 						paramList.add(new ImmutablePair<String, Parameter>("@body", param));
@@ -116,25 +115,26 @@ public class ServiceContainer {
 				}
 
 				if (StringUtils.isNotBlank(serviceUrl)) {
-					List<ServiceFilter> srvFilterList =  new ArrayList<ServiceFilter>();
+					List<ServiceFilter> srvFilterList = new ArrayList<ServiceFilter>();
 					srvFilterList.addAll(classFilterList);
 					srvFilterList.addAll(methodFilterList);
-					
+
 					for (ServiceFilter srvFilter : srvFilterList) {
 						logger.info(String.format("Add Service Filter: %s to %s", srvFilter.getClass().getName(), serviceClass.getName()));
 					}
-					
-					this.serviceCfgList.add(new ServiceConfig(serviceUrl, serviceMethod, contentType, charset, 
-							serviceClass, method, paramList, srvFilterList));
+
+					this.serviceCfgList
+							.add(new ServiceConfig(serviceUrl, serviceMethod, contentType, charset, 
+									serviceClass, serviceObj, method, paramList, srvFilterList));
 				}
 			}
 		}
 	}
-	
+
 	private List<ServiceFilter> getSecurity(Security security) {
-		
-		List<ServiceFilter> filterList =  new ArrayList<ServiceFilter>();
-		
+
+		List<ServiceFilter> filterList = new ArrayList<ServiceFilter>();
+
 		String[] filterNames = security.name();
 		for (String filterName : filterNames) {
 			ServiceFilter srvFilter = filterMap.get(filterName);
@@ -142,14 +142,14 @@ public class ServiceContainer {
 				filterList.add(srvFilter);
 			}
 		}
-		
+
 		return filterList;
 	}
-	
-private List<ServiceFilter> getFilter(Filter filter) {
-		
-		List<ServiceFilter> filterList =  new ArrayList<ServiceFilter>();
-		
+
+	private List<ServiceFilter> getFilter(Filter filter) {
+
+		List<ServiceFilter> filterList = new ArrayList<ServiceFilter>();
+
 		String[] filterNames = filter.name();
 		for (String filterName : filterNames) {
 			ServiceFilter srvFilter = filterMap.get(filterName);
@@ -157,10 +157,10 @@ private List<ServiceFilter> getFilter(Filter filter) {
 				filterList.add(srvFilter);
 			}
 		}
-		
+
 		return filterList;
 	}
-	
+
 	public ServiceConfig getService(String requestUrl, String requestMethod) {
 		for (ServiceConfig serviceCfg : this.serviceCfgList) {
 			if (serviceCfg.isMatched(requestUrl, requestMethod)) {
@@ -169,18 +169,18 @@ private List<ServiceFilter> getFilter(Filter filter) {
 		}
 		return null;
 	}
-	
+
 	public void registerFilter(Class<?> filterClass) throws ServiceException {
 		try {
 			Object filterObj = filterClass.newInstance();
 			if (filterObj instanceof ServiceFilter) {
-				registerFilter((ServiceFilter)filterObj);
+				registerFilter((ServiceFilter) filterObj);
 			}
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}
 	}
-	
+
 	public void registerFilter(ServiceFilter filter) {
 		if (filter != null) {
 			String filterName = filter.getName();

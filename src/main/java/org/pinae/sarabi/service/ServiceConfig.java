@@ -22,6 +22,8 @@ public class ServiceConfig {
 	
 	private Class<?> clazz;
 	
+	private Object object;
+	
 	private Method method;
 	
 	private List<Pair<String, Parameter>> params;
@@ -29,7 +31,7 @@ public class ServiceConfig {
 	private List<ServiceFilter> filters;
 	
 	public ServiceConfig(String serviceUrl, String serviceMethod[], String contentType, String charset, Class<?> clazz, 
-			Method method, List<Pair<String, Parameter>> params, List<ServiceFilter> filters) {
+			Object object, Method method, List<Pair<String, Parameter>> params, List<ServiceFilter> filters) {
 		this.uuid = UUID.randomUUID().toString();
 		
 		this.serviceUrl = serviceUrl;
@@ -38,6 +40,7 @@ public class ServiceConfig {
 		this.charset = charset;
 		
 		this.clazz = clazz;
+		this.object = object;
 		this.method = method;
 		this.params = params;
 		
@@ -90,6 +93,14 @@ public class ServiceConfig {
 
 	public void setClazz(Class<?> clazz) {
 		this.clazz = clazz;
+	}
+
+	public Object getObject() {
+		return object;
+	}
+
+	public void setObject(Object object) {
+		this.object = object;
 	}
 
 	public Method getMethod() {

@@ -20,18 +20,24 @@ public class SarabiServer {
 	
 	private static Logger logger = Logger.getLogger(SarabiServer.class);
 
-	private List<Class<?>> classList = new ArrayList<Class<?>>();
+	private List<Class<?>> serviceClassList = new ArrayList<Class<?>>();
 	
-	private List<ServiceFilter> filterList = new ArrayList<ServiceFilter>();
+	private List<Object> serviceObjectList = new ArrayList<Object>();
+	
+	private List<ServiceFilter> serviceFilterList = new ArrayList<ServiceFilter>();
 	
 	private ServerConfig serverCfg;
 
 	public void registerService(Class<?> clazz) {
-		this.classList.add(clazz);
+		this.serviceClassList.add(clazz);
+	}
+	
+	public void registerService(Object object) {
+		this.serviceObjectList.add(object);
 	}
 
 	public void registerFilter(ServiceFilter filter) {
-		this.filterList.add(filter);
+		this.serviceFilterList.add(filter);
 	}
 
 	public SarabiServer() {
@@ -58,22 +64,34 @@ public class SarabiServer {
 		
 		ServiceContainer container = new ServiceContainer();
 
-		for (ServiceFilter filter : this.filterList) {
+		for (ServiceFilter filter : this.serviceFilterList) {
 			container.registerFilter(filter);
 		}
 
 		try {
-			if (this.classList.size() == 0) {
-				this.classList = ClassLoaderUtils.loadClass();
+			if (this.serviceClassList.size() == 0 && this.serviceObjectList.size() == 0) {
+				this.serviceClassList = ClassLoaderUtils.loadClass();
 			}
 			
-			for (Class<?> clazz : this.classList) {
-				if (clazz.isAnnotationPresent(Controller.class)) {
-					container.registerService(clazz);
+			for (Class<?> srvClass : this.serviceClassList) {
+				if (srvClass.isAnnotationPresent(Controller.class)) {
+					container.registerService(srvClass, null);
 				}
 				try {
-					if (clazz.asSubclass(ServiceFilter.class) != null || clazz.asSubclass(ServiceSecurity.class) != null) {
-						container.registerFilter(clazz);
+					if (srvClass.asSubclass(ServiceFilter.class) != null || srvClass.asSubclass(ServiceSecurity.class) != null) {
+						container.registerFilter(srvClass);
+					}
+				} catch (ClassCastException e) {
+					
+				}
+			}
+			
+			for (Object srvObj : this.serviceObjectList) {
+				container.registerService(srvObj);
+				Class<?> srvClass = srvObj.getClass();
+				try {
+					if (srvClass.asSubclass(ServiceFilter.class) != null || srvClass.asSubclass(ServiceSecurity.class) != null) {
+						container.registerFilter(srvClass);
 					}
 				} catch (ClassCastException e) {
 					
