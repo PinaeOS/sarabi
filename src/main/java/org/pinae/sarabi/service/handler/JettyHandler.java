@@ -41,11 +41,11 @@ public class JettyHandler extends AbstractHandler {
 		if (srvCfg != null) {
 			ServiceResponse srvResponse = null;
 			try {
-				srvResponse = this.executor.execute(srvCfg, request);	
+				srvResponse = this.executor.execute(srvCfg, request);
+				this.outputor.output(request, response, srvResponse);
 			} catch (ServiceException e) {
 				ResponseUtils.output(response, Http.HTTP_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
-			this.outputor.output(request, response, srvResponse);
 		}
 	}
 	
