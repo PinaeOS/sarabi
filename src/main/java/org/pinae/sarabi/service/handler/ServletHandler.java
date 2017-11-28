@@ -72,6 +72,8 @@ public class ServletHandler extends HttpServlet {
 			} catch (ServiceException e) {
 				ResponseUtils.output(response, Http.HTTP_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
+		} else {
+			ResponseUtils.output(response, Http.HTTP_NOT_FOUND, String.format("Service NOT Found: %s:%s ", uri, method));
 		}
 	}
 }
