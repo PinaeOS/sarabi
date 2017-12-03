@@ -12,6 +12,10 @@ import org.pinae.sarabi.service.Http;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Service {
+	String name() default "";
+	
+	String description() default "";
+	
 	String url();
 	
 	String[] method() default {Http.HTTP_GET};

@@ -13,6 +13,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.pinae.sarabi.service.annotation.Controller;
 import org.pinae.sarabi.service.filter.ServiceFilter;
 import org.pinae.sarabi.service.handler.JettyHandler;
+import org.pinae.sarabi.service.listener.RegisterListener;
 import org.pinae.sarabi.service.security.ServiceSecurity;
 import org.pinae.sarabi.service.util.ClassLoaderUtils;
 
@@ -26,6 +27,8 @@ public class SarabiServer {
 	
 	private List<ServiceFilter> serviceFilterList = new ArrayList<ServiceFilter>();
 	
+	private RegisterListener registerListener;
+	
 	private ServerConfig serverCfg;
 
 	public void registerService(Class<?> clazz) {
@@ -38,6 +41,10 @@ public class SarabiServer {
 
 	public void registerFilter(ServiceFilter filter) {
 		this.serviceFilterList.add(filter);
+	}
+	
+	public void setRegisterListener(RegisterListener registerListener) {
+		this.registerListener = registerListener;
 	}
 
 	public SarabiServer() {
@@ -62,7 +69,7 @@ public class SarabiServer {
 		
 		long startTime = System.currentTimeMillis();
 		
-		ServiceContainer container = new ServiceContainer();
+		ServiceContainer container = new ServiceContainer(this.registerListener);
 
 		for (ServiceFilter filter : this.serviceFilterList) {
 			container.registerFilter(filter);

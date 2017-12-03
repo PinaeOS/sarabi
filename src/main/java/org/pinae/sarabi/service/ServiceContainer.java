@@ -19,6 +19,7 @@ import org.pinae.sarabi.service.annotation.Header;
 import org.pinae.sarabi.service.annotation.Security;
 import org.pinae.sarabi.service.annotation.Service;
 import org.pinae.sarabi.service.filter.ServiceFilter;
+import org.pinae.sarabi.service.listener.RegisterListener;
 
 public class ServiceContainer {
 
@@ -27,6 +28,12 @@ public class ServiceContainer {
 	private List<ServiceConfig> serviceCfgList = new ArrayList<ServiceConfig>();
 
 	private Map<String, ServiceFilter> filterMap = new HashMap<String, ServiceFilter>();
+	
+	private RegisterListener registerListener;
+	
+	public ServiceContainer(RegisterListener registerListener) {
+		this.registerListener = registerListener;
+	}
 
 	public void registerService(String className) throws ServiceException {
 		try {
@@ -80,6 +87,16 @@ public class ServiceContainer {
 				}
 				String contentType = service.contentType();
 				String charset = service.charset();
+				
+				if (this.registerListener != null) {
+					String serviceName = service.name();
+					if (StringUtils.isBlank(serviceName)) {
+						serviceName = serviceUrl;
+					}
+					String serviceDesc = service.description();
+					
+					this.registerListener.register(serviceName, serviceDesc, serviceUrl, serviceMethod);
+				}
 
 				logger.info(String.format("Register Service: class=%s, method=%s, request-url=%s, http-method=%s, content-type=%s, charset=%s",
 						serviceClass.getName(), method.getName(), serviceUrl, StringUtils.join(serviceMethod, ","), contentType, charset));
