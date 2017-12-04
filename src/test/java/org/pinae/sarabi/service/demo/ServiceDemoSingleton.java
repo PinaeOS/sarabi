@@ -16,12 +16,12 @@ public class ServiceDemoSingleton {
 		this.tag = "Singleton:" + this.toString();
 	}
 	
-	@Service(url = "/single/t1", method = {Http.HTTP_GET}, contentType = Http.TEXT_PLAIN)
+	@Service(name = "t1", url = "/single/t1", method = {Http.HTTP_GET}, contentType = Http.TEXT_PLAIN)
 	public String getSingletonT1(@Field(name = "name") String name) {
 		return this.tag + ":" + name;
 	}
 	
-	@Service(url = "/single/t2", method = {Http.HTTP_GET}, contentType = Http.TEXT_PLAIN)
+	@Service(name = "t2", url = "/single/t2", method = {Http.HTTP_GET}, contentType = Http.TEXT_PLAIN)
 	public String getSingletonT2() {
 		return this.tag + ":" + new Date().toString();
 	}

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.pinae.sarabi.service.SarabiServer;
 import org.pinae.sarabi.service.ServerConfig;
+import org.pinae.sarabi.service.demo.listener.MyServiceRegisterListener;
 import org.pinae.sarabi.service.security.HttpBasicAuthFilter;
 
 public class TestServiceStart {
@@ -18,6 +19,7 @@ public class TestServiceStart {
 		serverCfg.setTimeout(180);
 		
 		SarabiServer server = new SarabiServer(serverCfg);
+		server.setRegisterListener(new MyServiceRegisterListener());
 		server.registerFilter(new CustomFilter());
 		server.registerFilter(new HttpBasicAuthFilter(authInfo));
 		server.registerService(ServiceDemo.class);

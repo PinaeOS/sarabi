@@ -20,12 +20,12 @@ import com.alibaba.fastjson.JSON;
 @Controller
 public class ServiceDemo {
 	
-	@Service(url = "/person/say", method = {Http.HTTP_GET}, contentType = Http.TEXT_PLAIN)
+	@Service(name="sayHello", url = "/person/say", method = {Http.HTTP_GET}, contentType = Http.TEXT_PLAIN)
 	public String sayHello(@Field(name = "name") String name) {
 		return "Hello " + name;
 	}
 	
-	@Service(url = "/body/read", method = {Http.HTTP_POST}, contentType = Http.TEXT_PLAIN)
+	@Service(name="readBody", url = "/body/read", method = {Http.HTTP_POST}, contentType = Http.TEXT_PLAIN)
 	@Security(name = {"HttpBasic"})
 	public String readBody(@Body String body, @Field(name = "name") String name, @Header(name = "Content-Type") String type) {
 		StringBuffer buffer = new StringBuffer();
@@ -35,7 +35,7 @@ public class ServiceDemo {
 		return buffer.toString();
 	}
 	
-	@Service(url = "/group/{groupId}/person/{personId}", method = {Http.HTTP_GET}, contentType = Http.APPLICATION_JSON)
+	@Service(name="getPersonInGroup", url = "/group/{groupId}/person/{personId}", method = {Http.HTTP_GET}, contentType = Http.APPLICATION_JSON)
 	@Filter(name = "CustomFilter")
 	public String getPerson(@Field(name = "groupId") String groupId, @Field(name = "personId") String personId) {
 		Map<String, String> person = new HashMap<String, String>();
@@ -44,7 +44,7 @@ public class ServiceDemo {
 		return JSON.toJSONString(person);
 	}
 	
-	@Service(url = "/get/request", method = {Http.HTTP_GET}, contentType = Http.APPLICATION_JSON)
+	@Service(name="getHttpRequest", url = "/get/request", method = {Http.HTTP_GET}, contentType = Http.APPLICATION_JSON)
 	public String getRequest(@Field(name = "@query") Map<String, Object> query, @Field(name = "@header") Map<String, String> header) {
 		Map<String, Object> request = new HashMap<String, Object>();
 		request.put("query", query);
