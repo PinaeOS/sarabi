@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.pinae.nala.xb.Xml;
 import org.pinae.nala.xb.exception.MarshalException;
@@ -46,9 +47,12 @@ public class ServiceOutputor {
 		String contentType = srvResponse.getContentType();
 
 		httpResponse.setContentType(contentType);
-		if (srvResponse.getCharset() != null) {
-			httpResponse.setCharacterEncoding(srvResponse.getCharset());
+		
+		String charset = srvResponse.getCharset();
+		if (StringUtils.isBlank(charset)) {
+			charset = "UTF-8";
 		}
+		httpResponse.setCharacterEncoding(charset);
 
 		Object content = null;
 
@@ -95,12 +99,12 @@ public class ServiceOutputor {
 				os.close();
 			} else {
 				String contentStr = content.toString();
-				print(contentStr, httpResponse);
+				print(charset, contentStr, httpResponse);
 
 				contentSize = contentStr.length();
 			}
 		} else {
-			print("", httpResponse);
+			print(charset, "", httpResponse);
 		}
 		
 		log(httpRequest, httpResponse);
@@ -109,8 +113,8 @@ public class ServiceOutputor {
 
 	}
 
-	private void print(String content, HttpServletResponse response) throws IOException {
-		int length = content.length();
+	private void print(String charset, String content, HttpServletResponse response) throws IOException {
+		int length = content.getBytes(charset).length;
 		if (length > 0) {
 			response.addIntHeader("Content-Length", length);
 			response.addHeader("Content-MD5", DigestUtils.md5Hex(content));

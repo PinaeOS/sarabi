@@ -53,4 +53,9 @@ public class ServiceDemo {
 		return JSON.toJSONString(request);
 	}
 	
+	@Service(name="sayChinese", url = "/person/say/chinese", method = {Http.HTTP_GET}, contentType = Http.TEXT_PLAIN)
+	public String sayChinese(@Field(name = "name") String name) {
+		return "你好, " + name;
+	}
+	
 }
