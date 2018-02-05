@@ -8,11 +8,11 @@ import org.pinae.sarabi.service.annotation.Field;
 import org.pinae.sarabi.service.annotation.Service;
 
 @Controller(singleton = true)
-public class ServiceDemoSingleton {
+public class SingletonServiceDemo {
 	
 	private String tag;
 	
-	public ServiceDemoSingleton() {
+	public SingletonServiceDemo() {
 		this.tag = "Singleton:" + this.toString();
 	}
 	

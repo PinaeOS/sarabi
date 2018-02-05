@@ -51,6 +51,9 @@ public class ServiceContainer {
 	}
 
 	public void registerService(Class<?> serviceClass, Object serviceObj) {
+		
+		Controller controller = serviceClass.getAnnotation(Controller.class);
+		String baseUrl = controller.url();
 
 		List<ServiceFilter> classFilterList = new ArrayList<ServiceFilter>();
 		if (serviceClass.isAnnotationPresent(Security.class)) {
@@ -81,6 +84,10 @@ public class ServiceContainer {
 				Service service = method.getAnnotation(Service.class);
 
 				String serviceUrl = service.url();
+				if (StringUtils.isNotBlank(baseUrl)) {
+					serviceUrl = baseUrl + serviceUrl;
+				}
+				
 				String serviceMethod[] = service.method();
 				if (serviceMethod == null) {
 					serviceMethod = new String[] { Http.HTTP_GET };

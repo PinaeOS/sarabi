@@ -22,8 +22,10 @@ public class TestServiceStart {
 		server.setRegisterListener(new MyServiceRegisterListener());
 		server.registerFilter(new CustomFilter());
 		server.registerFilter(new HttpBasicAuthFilter(authInfo));
+		
+		server.registerService(ParentPathDemo.class);
 		server.registerService(ServiceDemo.class);
-		server.registerService(ServiceDemoSingleton.class);
+		server.registerService(SingletonServiceDemo.class);
 		server.startup();
 	}
 }
