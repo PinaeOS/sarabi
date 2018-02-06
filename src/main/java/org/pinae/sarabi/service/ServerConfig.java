@@ -26,6 +26,12 @@ public class ServerConfig {
 	
 	private long timeout = TimeUnit.SECONDS.toMillis(60);
 	
+	private int minThread = 8;
+	
+	private int maxThread = 128;
+	
+	private int acceptQueueSize = 512;
+	
 	private int outputBufferSize = 32 * KB;
 	
 	private int requestHeaderSize = 256 * KB;
@@ -49,10 +55,15 @@ public class ServerConfig {
 			this.port = getInteger("server.port", 80);
 		
 			this.timeout = TimeUnit.SECONDS.toMillis(getLong("server.timeout", 60));
+			
+			this.minThread = getInteger("server.thread.min", 8);
+			this.maxThread = getInteger("server.maxThreaed", 16);
+			
+			this.acceptQueueSize = getInteger("server.queue.accept-size", 256);
 		
-			this.outputBufferSize = getInteger("server.output-buffer-size", 32) * KB;
-			this.requestHeaderSize = getInteger("server.request-header-size", 256) * KB;
-			this.responseHeaderSize = getInteger("server.response-header-size", 256) * KB;
+			this.outputBufferSize = getInteger("server.output.buffer-size", 32) * KB;
+			this.requestHeaderSize = getInteger("server.request.header-size", 256) * KB;
+			this.responseHeaderSize = getInteger("server.response.header-size", 256) * KB;
 		}
 	}
 
@@ -94,6 +105,30 @@ public class ServerConfig {
 
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
+	}
+
+	public int getMinThread() {
+		return minThread;
+	}
+
+	public void setMinThread(int minThread) {
+		this.minThread = minThread;
+	}
+
+	public int getMaxThread() {
+		return maxThread;
+	}
+
+	public void setMaxThread(int maxThread) {
+		this.maxThread = maxThread;
+	}
+
+	public int getAcceptQueueSize() {
+		return acceptQueueSize;
+	}
+
+	public void setAcceptQueueSize(int acceptQueueSize) {
+		this.acceptQueueSize = acceptQueueSize;
 	}
 
 	public int getOutputBufferSize() {
@@ -151,6 +186,8 @@ public class ServerConfig {
 		connector.setIdleTimeout(TimeUnit.SECONDS.toMillis(this.timeout));
 		connector.setConnectionFactories(getFactories());
 		
+		connector.setAcceptQueueSize(this.acceptQueueSize);
+		
 		return connector;
 	}
 	
@@ -161,7 +198,9 @@ public class ServerConfig {
 	}
 	
 	private HttpConfiguration getHttpConfig() {
+		
 		HttpConfiguration httpConfig = new HttpConfiguration();
+		
 		httpConfig.setOutputBufferSize(this.outputBufferSize);
 		httpConfig.setRequestHeaderSize(this.requestHeaderSize);
 		httpConfig.setResponseHeaderSize(this.responseHeaderSize);

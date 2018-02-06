@@ -10,6 +10,8 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.util.thread.ThreadPool;
 import org.pinae.sarabi.service.annotation.Controller;
 import org.pinae.sarabi.service.filter.ServiceFilter;
 import org.pinae.sarabi.service.handler.JettyHandler;
@@ -106,7 +108,13 @@ public class SarabiServer {
 			}
 			
 			Server server = new Server();
-
+			ThreadPool threadPool = server.getThreadPool();
+			if (threadPool instanceof QueuedThreadPool) {
+				QueuedThreadPool queuedThreadPool = (QueuedThreadPool)threadPool;
+				queuedThreadPool.setMinThreads(this.serverCfg.getMinThread());
+				queuedThreadPool.setMaxThreads(this.serverCfg.getMaxThread());
+			}
+			
 			ServerConnector connector = createConnector(server, this.serverCfg);
 
 			server.addConnector(connector);
