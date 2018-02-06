@@ -26,9 +26,13 @@ public class ServerConfig {
 	
 	private long timeout = TimeUnit.SECONDS.toMillis(60);
 	
+	private boolean threadCfg = false;
+	
 	private int minThread = 8;
 	
 	private int maxThread = 128;
+	
+	private long threadTimeout = TimeUnit.SECONDS.toMillis(60);
 	
 	private int acceptQueueSize = 512;
 	
@@ -56,10 +60,12 @@ public class ServerConfig {
 		
 			this.timeout = TimeUnit.SECONDS.toMillis(getLong("server.timeout", 60));
 			
+			this.threadCfg = getBoolean("server.thread");
 			this.minThread = getInteger("server.thread.min", 8);
-			this.maxThread = getInteger("server.maxThreaed", 16);
+			this.maxThread = getInteger("server.thread.max", 128);
+			this.threadTimeout = TimeUnit.SECONDS.toMillis(getLong("server.thread.timeout", 60));
 			
-			this.acceptQueueSize = getInteger("server.queue.accept-size", 256);
+			this.acceptQueueSize = getInteger("server.queue.accept-size", 512);
 		
 			this.outputBufferSize = getInteger("server.output.buffer-size", 32) * KB;
 			this.requestHeaderSize = getInteger("server.request.header-size", 256) * KB;
@@ -106,9 +112,13 @@ public class ServerConfig {
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
 	}
+	
+	public boolean isThreadCfg() {
+		return this.threadCfg;
+	}
 
 	public int getMinThread() {
-		return minThread;
+		return this.minThread;
 	}
 
 	public void setMinThread(int minThread) {
@@ -116,15 +126,23 @@ public class ServerConfig {
 	}
 
 	public int getMaxThread() {
-		return maxThread;
+		return this.maxThread;
 	}
 
 	public void setMaxThread(int maxThread) {
 		this.maxThread = maxThread;
 	}
 
+	public int getThreadTimeout() {
+		return new Long(this.threadTimeout).intValue();
+	}
+
+	public void setThreadTimeout(long threadTimeout) {
+		this.threadTimeout = threadTimeout;
+	}
+
 	public int getAcceptQueueSize() {
-		return acceptQueueSize;
+		return this.acceptQueueSize;
 	}
 
 	public void setAcceptQueueSize(int acceptQueueSize) {
@@ -157,6 +175,10 @@ public class ServerConfig {
 	
 	private String getString(String key, String defaultValue) {
 		return this.serverProp.getProperty(key, defaultValue);
+	}
+	
+	private boolean getBoolean(String key) {
+		return Boolean.parseBoolean(this.serverProp.getProperty(key));
 	}
 	
 	private int getInteger(String key, int defaultValue) {
