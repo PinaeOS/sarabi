@@ -19,7 +19,9 @@ public class TestServiceStart {
 		serverCfg.setTimeout(180);
 		
 		SarabiServer server = new SarabiServer(serverCfg);
-		server.setRegisterListener(new MyServiceRegisterListener());
+		
+		server.addRegisterListener(new MyServiceRegisterListener());
+		
 		server.registerFilter(new CustomFilter());
 		server.registerFilter(new HttpBasicAuthFilter(authInfo));
 		

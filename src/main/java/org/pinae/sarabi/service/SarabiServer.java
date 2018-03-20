@@ -29,7 +29,7 @@ public class SarabiServer {
 
 	private List<ServiceFilter> serviceFilterList = new ArrayList<ServiceFilter>();
 
-	private RegisterListener registerListener;
+	private List<RegisterListener> registerListenerList;
 
 	private ServerConfig serverCfg;
 
@@ -45,8 +45,8 @@ public class SarabiServer {
 		this.serviceFilterList.add(filter);
 	}
 
-	public void setRegisterListener(RegisterListener registerListener) {
-		this.registerListener = registerListener;
+	public void addRegisterListener(RegisterListener registerListener) {
+		this.registerListenerList.add(registerListener);
 	}
 
 	public SarabiServer() {
@@ -71,7 +71,7 @@ public class SarabiServer {
 
 		long startTime = System.currentTimeMillis();
 
-		ServiceContainer container = new ServiceContainer(this.registerListener);
+		ServiceContainer container = new ServiceContainer(this.registerListenerList);
 
 		for (ServiceFilter filter : this.serviceFilterList) {
 			container.registerFilter(filter);

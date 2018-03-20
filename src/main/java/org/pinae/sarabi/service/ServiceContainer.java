@@ -16,6 +16,7 @@ import org.pinae.sarabi.service.annotation.Controller;
 import org.pinae.sarabi.service.annotation.Field;
 import org.pinae.sarabi.service.annotation.Filter;
 import org.pinae.sarabi.service.annotation.Header;
+import org.pinae.sarabi.service.annotation.Register;
 import org.pinae.sarabi.service.annotation.Security;
 import org.pinae.sarabi.service.annotation.Service;
 import org.pinae.sarabi.service.filter.ServiceFilter;
@@ -29,10 +30,10 @@ public class ServiceContainer {
 
 	private Map<String, ServiceFilter> filterMap = new HashMap<String, ServiceFilter>();
 	
-	private RegisterListener registerListener;
+	private List<RegisterListener> registerListenerList;
 	
-	public ServiceContainer(RegisterListener registerListener) {
-		this.registerListener = registerListener;
+	public ServiceContainer(List<RegisterListener> registerListenerList) {
+		this.registerListenerList = registerListenerList;
 	}
 
 	public void registerService(String className) throws ServiceException {
@@ -65,6 +66,11 @@ public class ServiceContainer {
 			Filter filter = serviceClass.getAnnotation(Filter.class);
 			classFilterList.addAll(getFilter(filter));
 		}
+		
+		boolean isRegister = false;
+		if (serviceClass.isAnnotationPresent(Register.class)) {
+			isRegister = true;
+		}
 
 		Method methods[] = serviceClass.getDeclaredMethods();
 		for (Method method : methods) {
@@ -78,6 +84,10 @@ public class ServiceContainer {
 			if (method.isAnnotationPresent(Filter.class)) {
 				Filter filter = method.getAnnotation(Filter.class);
 				methodFilterList.addAll(getFilter(filter));
+			}
+			
+			if (method.isAnnotationPresent(Register.class)) {
+				isRegister = true;
 			}
 
 			if (method.isAnnotationPresent(Service.class)) {
@@ -95,14 +105,16 @@ public class ServiceContainer {
 				String contentType = service.contentType();
 				String charset = service.charset();
 				
-				if (this.registerListener != null) {
-					String serviceName = service.name();
-					if (StringUtils.isBlank(serviceName)) {
-						serviceName = serviceUrl;
+				if (this.registerListenerList != null && this.registerListenerList.size() > 0) {
+					for (RegisterListener registerListener : this.registerListenerList) {
+						String serviceName = service.name();
+						if (StringUtils.isBlank(serviceName)) {
+							serviceName = serviceUrl;
+						}
+						String serviceDesc = service.description();
+						
+						registerListener.register(isRegister, serviceName, serviceDesc, serviceUrl, serviceMethod);
 					}
-					String serviceDesc = service.description();
-					
-					this.registerListener.register(serviceName, serviceDesc, serviceUrl, serviceMethod);
 				}
 
 				logger.info(String.format("Register Service: class=%s, method=%s, request-url=%s, http-method=%s, content-type=%s, charset=%s",
