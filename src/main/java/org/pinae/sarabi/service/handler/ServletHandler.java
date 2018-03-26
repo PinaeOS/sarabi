@@ -1,6 +1,7 @@
 package org.pinae.sarabi.service.handler;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -67,8 +68,9 @@ public class ServletHandler extends HttpServlet {
 		if (srvCfg != null) {
 			ServiceResponse srvResponse = null;
 			try {
+				Date startTime = new Date(); 
 				srvResponse = this.executor.execute(srvCfg, request);
-				this.outputor.output(request, response, srvResponse);
+				this.outputor.output(startTime, request, response, srvResponse);
 			} catch (ServiceException e) {
 				ResponseUtils.output(response, Http.HTTP_INTERNAL_SERVER_ERROR, e.getMessage());
 			}

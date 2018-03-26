@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +31,13 @@ public class ServiceOutputor {
 	
 	private ServerConfig serverCfg;
 	
+	private static DateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
 	public ServiceOutputor(final ServerConfig serverCfg) {
 		this.serverCfg = serverCfg;
 	}
 	
-	public long output(HttpServletRequest httpRequest, HttpServletResponse httpResponse, ServiceResponse srvResponse) throws IOException {
+	public long output(Date startTime, HttpServletRequest httpRequest, HttpServletResponse httpResponse, ServiceResponse srvResponse) throws IOException {
 
 		httpResponse.setStatus(srvResponse.getStatus());
 		
@@ -107,7 +112,8 @@ public class ServiceOutputor {
 			print(charset, "", httpResponse);
 		}
 		
-		log(httpRequest, httpResponse);
+		long usedTime = System.currentTimeMillis() - startTime.getTime();
+		log(startTime, usedTime, httpRequest, httpResponse);
 
 		return contentSize;
 
@@ -130,8 +136,8 @@ public class ServiceOutputor {
 		}
 	}
 	
-	private void log(HttpServletRequest request, HttpServletResponse response) {
-		String logFmt = "client=%s, agent=%s, schema=%s, method=%s, uri=%s, status=%d, respBody=%d";
+	private void log(Date startTime, long usedTime, HttpServletRequest request, HttpServletResponse response) {
+		String logFmt = "time=%s, client=%s, agent=%s, schema=%s, method=%s, uri=%s, used=%d, status=%d, size=%d";
 		
 		String remoteAddr = request.getRemoteHost();
 		String reqSchema = request.getScheme();
@@ -146,6 +152,7 @@ public class ServiceOutputor {
 		}
 		String userAgent = request.getHeader("User-Agent");
 		
-		logger.info(String.format(logFmt, remoteAddr, userAgent, reqSchema, reqMethod, reqUri, status, bodySize));
+		logger.info(String.format(logFmt, dateFmt.format(startTime), remoteAddr, userAgent, 
+				reqSchema, reqMethod, reqUri, usedTime, status, bodySize));
 	}
 }
